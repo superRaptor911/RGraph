@@ -111,6 +111,8 @@ namespace rg
 
 		bool putAt();
 
+		std::string getLine
+
 		~File();
 	};
 }

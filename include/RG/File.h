@@ -20,12 +20,13 @@ namespace rg
 	{
 		typedef std::ios_base::openmode Fmode;
 
+		static const Fmode BINARY = std::fstream::binary;
+
 	public:
 
 		static const Fmode READ = std::fstream::in;
 		static const Fmode WRITE = std::fstream::out;
 		static const Fmode READ_WRITE = (std::fstream::in | std::fstream::out);
-		static const Fmode BINARY = std::fstream::binary;
 		
 	private:
 	
@@ -89,7 +90,14 @@ namespace rg
 		 */
 		bool appendBinary(const void *data, int size);
 
-		
+		/**
+		 * @brief Append Object
+		 * 
+		 * @tparam Any object 
+		 * @param t 
+		 * @return true 
+		 * @return false 
+		 */
 		template<typename T>
 		bool appendBinary(const T &t)
 		{
@@ -105,13 +113,21 @@ namespace rg
 		/**
 		 * @brief Get size of file in bytes.
 		 * 
-		 * @return int 
+		 * @return long int 
 		 */
-		int size();
+		long int size();
 
 		bool putAt();
 
-		std::string getLine
+		/**
+		 * @brief Get the File Content
+		 * 
+		 * @return std::string 
+		 */
+		std::string getFileContent();
+	
+
+		//std::string getLine
 
 		~File();
 	};

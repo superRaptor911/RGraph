@@ -1,7 +1,7 @@
 #ifndef RGRAPH_H
 #define RGRAPH_H
 
-#include <vec2.h>
+
 
 namespace rg
 {
@@ -9,7 +9,7 @@ namespace rg
 	{
 	private:
 
-		vec2 window_resolution;
+		//vec2 window_resolution;
 		
 		
 	public:

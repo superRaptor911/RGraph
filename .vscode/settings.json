@@ -45,6 +45,13 @@
 		"streambuf": "cpp",
 		"cinttypes": "cpp",
 		"typeinfo": "cpp",
-		"map": "cpp"
+		"map": "cpp",
+		"bit": "cpp",
+		"cstring": "cpp",
+		"functional": "cpp",
+		"iterator": "cpp",
+		"numeric": "cpp",
+		"random": "cpp",
+		"iomanip": "cpp"
 	}
 }

@@ -11,16 +11,19 @@
 
 #include <SDL2/SDL.h>
 #include <iostream>
-#include <cleanup.h>
-#include <r_util.h>
-#include <vec2.h>
-
-#include <DirMan.h>
+#include <RG/cleanup.h>
+#include <RG/r_util.h>
+#include <RG/File.h>
+#include <RG/DirMan.h>
 
 
 int main()
 {
 	//std::cout<<rg::fileExists("../main.cpp");
+	rg::File f;
+	f.open("test.txt");
+	f.append("abcd efg hij");
+	f.close();
 	SDL_Window *win = SDL_CreateWindow("Hello World!", 100, 100, 640, 480, SDL_WINDOW_SHOWN);
 	if (win == nullptr) {
 		std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;

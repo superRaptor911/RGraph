@@ -8,13 +8,17 @@
  * @copyright Copyright (c) 2020
  * 
  */
-#include <File.h>
-#include <r_util.h>
+#include <RG/File.h>
+#include <RG/r_util.h>
+#include <sstream>
 
-#define ENABLE_DIRMAN
+//#define ENABLE_DIRMAN
+
+#define ENABLE_LOGGING
+
 
 #ifdef ENABLE_DIRMAN
-#include <DirMan.h>
+#include <RG/DirMan.h>
 #endif
 
 using namespace rg;
@@ -93,12 +97,32 @@ bool File::appendBinary(const void *data, int size)
  * 
  * @return Size of file.
  */
-int File::size()
+long int File::size()
 {
 	if (!_is_open)
 		return -1;
 
 	_file.seekg(std::fstream::end);
 	return _file.tellg();
+}
+
+
+std::string File::getFileContent()
+{
+	if (!_is_open || _rwMode == READ)
+		return "";
+	
+	std::stringstream buffer;
+	
+	_file.seekg(std::fstream::beg);
+	buffer << _file.rdbuf();
+	
+	return buffer.str();	
+}
+
+File::~File()
+{
+	if (_is_open)
+		_file.close();
 }
 

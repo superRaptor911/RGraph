@@ -3,7 +3,7 @@
 
 #include <utility>
 #include <SDL2/SDL.h>
-#include <r_util.h>
+#include <RG/r_util.h>
 
 /*
  * Recurse through the list of arguments to clean up, cleaning up

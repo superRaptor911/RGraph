@@ -36,7 +36,7 @@ namespace rg
 		bool _is_binary;
 
 	public:
-		
+	
 		/**
 		 * @brief Open a file
 		 * 
@@ -44,10 +44,12 @@ namespace rg
 		 * @param rwmode read write mode, default write.
 		 * @param fmode file mode, default text.
 		 * @param binary is binary file ?
+		 * @param truncate erase file
 		 * @return true if successful.
 		 * @return false 
 		 */
-		bool open(const std::string &file_path, Fmode rwmode = WRITE, bool binary = false);
+		bool open(const std::string &file_path, Fmode rwmode = WRITE, 
+					bool binary = false, bool truncate = false);
 		
 		/**
 		 * @brief Close opened file.
@@ -99,13 +101,12 @@ namespace rg
 		 * @return false 
 		 */
 		template<typename T>
-		bool appendBinary(const T &t)
+		bool appendBinary(T &t)
 		{
 			if (!_is_open || !_is_binary)
 				return false;
 
-			_file.seekp(std::fstream::end);
-			_file.write((char *)t, sizeof(t));
+			_file.write((char *)&t, sizeof(t));
 
 			return !_file.bad();
 		}
@@ -125,9 +126,43 @@ namespace rg
 		 * @return std::string 
 		 */
 		std::string getFileContent();
-	
 
-		//std::string getLine
+		/**
+		 * @brief Read from file
+		 * 
+		 * @param data 
+		 * @param size 
+		 * @return true 
+		 * @return false 
+		 */
+		bool readBinary(const void *data, int size);
+
+		template<typename T>
+		bool readBinary(T &t)
+		{
+			if (!_is_open || !_is_binary)
+				return false;
+
+			_file.read((char *)&t, sizeof(t));
+
+			return !_file.bad();
+		}
+
+
+		/**
+		 * @brief Get Line
+		 * 
+		 * @return std::string 
+		 */
+		std::string getLine();
+
+		/**
+		 * @brief check if reached end of file
+		 * 
+		 * @return true 
+		 * @return false 
+		 */
+		bool eof() { return _file.eof();}
 
 		~File();
 	};

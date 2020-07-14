@@ -14,6 +14,8 @@
 
 #include <string>
 
+#define ENABLE_LOGGING
+
 #ifdef ENABLE_LOGGING
 /**
  * @brief Print console error

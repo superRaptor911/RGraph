@@ -16,17 +16,16 @@
 #include <RG/File.h>
 #include <RG/DirMan.h>
 
+
 int main()
 {
-	//std::cout<<rg::fileExists("../main.cpp");
 	rg::File f;
 	f.open("test.txt", rg::File::READ, false);
+	auto strings = rg::util::splitStr(f.getFileContent()," ");
 	
-	while (!f.eof())
-	{
-		std::cout << f.getLine() << "\n";
-	}
-	
+	for (auto &it : strings)
+		std::cout << it << "\n";
+
 	f.close();
 	std::cout << "Done";
 	exit(0);

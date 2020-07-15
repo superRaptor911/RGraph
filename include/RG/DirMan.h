@@ -20,7 +20,7 @@ namespace rg
 	{
 	private:
 
-		inline static std::map<std::string, std::string> _registered_paths;
+		inline static std::map<std::string, std::string> _alias_paths;
 
 	public:
 
@@ -32,7 +32,7 @@ namespace rg
 		 * @param path 
 		 * @return std::string path
 		 */
-		std::string getActualPath(const std::string &path);
+		std::string getAliasPath(const std::string &alias);
 
 		/**
 		 * @brief Check if file exists or not.
@@ -46,7 +46,7 @@ namespace rg
 
 		bool dirExists(const std::string &path);
 
-		void registerPath(const std::string &name, const std::string &path);
+		void registerAlias(const std::string &alias, const std::string &path);
 
 	};
 

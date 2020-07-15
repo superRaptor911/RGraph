@@ -11,30 +11,14 @@ namespace fs = std::experimental::filesystem;
  * @param path 
  * @return std::string 
  */
-std::string DirMan::getActualPath(const std::string &path)
+std::string DirMan::getAliasPath(const std::string &alias)
 {
+	auto pair = _alias_paths.find(alias);
 	
-	std::size_t div = path.find(":");
-	
-	//Wrong format
-	if (div == std::string::npos)
-	{
-		R_CPRINT_ERR("Invalid path format");
+	if (pair != _alias_paths.end())
 		return "";
-	}
-
-	auto it = _registered_paths.find(path.substr(0, div));
-
-	//Could not find alias in _registered_paths
-	if (it == _registered_paths.end())
-	{
-		R_CPRINT_ERR(("Path alias " + path.substr(0, div) + " not found.").c_str());
-		return "";
-	}
-
-	std::string sub_path = path.substr(div + 1);
-
-	return it->second + sub_path;
+	else
+		return pair->second;
 }
 
 
@@ -47,7 +31,11 @@ std::string DirMan::getActualPath(const std::string &path)
  */
 bool DirMan::fileExists(const std::string &path)
 {
-	return fs::is_regular_file(fs::path(getActualPath(path)));
+	auto strings = rg::util::splitStr(path,">");
+	if (strings.size() > 1)
+		return fs::is_regular_file(getAliasPath(strings[0]) + "/" + strings[1] );
+	
+	return fs::is_regular_file( getAliasPath(path) );
 }
 
 
@@ -60,7 +48,11 @@ bool DirMan::fileExists(const std::string &path)
  */
 bool DirMan::dirExists(const std::string &path)
 {
-	return fs::is_directory(fs::path(getActualPath(path)));
+	auto strings = rg::util::splitStr(path,">");
+	if (strings.size() > 1)
+		return fs::is_directory( getAliasPath(strings[0]) + "/" + strings[1] );
+	
+	return fs::is_directory( getAliasPath(path) );
 }
 
 
@@ -70,14 +62,13 @@ bool DirMan::dirExists(const std::string &path)
  * @param name alias.
  * @param path path to.
  */
-void DirMan::registerPath(const std::string &name, const std::string &path)
-{
-	//Key exist
-	if (_registered_paths.find(name) == _registered_paths.end())
-	{
-		R_CPRINT_ERR(("Key " + name + "already exist").c_str());
-		return;
-	}
+void DirMan::registerAlias(const std::string &alias, const std::string &path)
+{	
+	auto pair = _alias_paths.find(alias);
 
-	_registered_paths[name] = path;
+	// Key exist, update value
+	if (pair != _alias_paths.end())
+		pair->second = path;
+	else
+		_alias_paths[alias] = path;
 }

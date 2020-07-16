@@ -4,9 +4,52 @@
 
 using namespace rg;
 
+Texture::Texture()
+{
+    // Start Reference counting
+    ref_count = new int;
+    *ref_count = 1;
+}
+
 Texture::Texture(const std::string &path)
 {
+    // Start Reference counting
+    ref_count = new int;
+    *ref_count = 1;
+
     loadTexture(path);
+}
+
+Texture::Texture(const Texture &T)
+{
+    // Do ref counting
+    ref_count = T.ref_count;
+    *ref_count += 1;
+
+    _texture = T._texture;
+}
+
+Texture &Texture::operator = (const Texture &T)
+{
+    // Reduce ref by 1
+    *ref_count -= 1;
+
+    // Delete resource 
+    if (ref_count == 0)
+    {
+        delete ref_count;
+
+        // Destroy Texture if exists
+        if (_texture)
+            SDL_DestroyTexture(_texture);
+    }
+
+    ref_count = T.ref_count;
+    *ref_count += 1;
+
+    _texture = T._texture;
+
+    return *this;
 }
 
 bool Texture::loadTexture(const std::string &path)
@@ -31,6 +74,16 @@ glm::ivec2 Texture::getSize() const
 
 Texture::~Texture()
 {
-    if (_texture)
-        SDL_DestroyTexture(_texture);
+    // Reduce ref by 1
+    *ref_count -= 1;
+
+    // Delete resource 
+    if (ref_count == 0)
+    {
+        delete ref_count;
+
+        // Destroy Texture if exists
+        if (_texture)
+            SDL_DestroyTexture(_texture);
+    }
 }

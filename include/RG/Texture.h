@@ -17,10 +17,16 @@ namespace rg
 
         SDL_Texture *_texture = nullptr;
 
+        int *ref_count = nullptr;
+
 
     public:
         
-        Texture() {}
+        Texture();
+
+        // Disable copy
+        Texture(const Texture &T);
+        Texture &operator = (const Texture &T);
 
         Texture(const std::string &path);
         bool loadTexture(const std::string &path);

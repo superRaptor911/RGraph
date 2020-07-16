@@ -24,8 +24,9 @@ namespace rg
         
         Texture();
 
-        // Disable copy
+        // cpy constructor
         Texture(const Texture &T);
+        // cpy operator
         Texture &operator = (const Texture &T);
 
         Texture(const std::string &path);

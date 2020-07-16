@@ -53,5 +53,6 @@
 		"numeric": "cpp",
 		"random": "cpp",
 		"iomanip": "cpp"
-	}
+	},
+	"C_Cpp.errorSquiggles": "Enabled"
 }

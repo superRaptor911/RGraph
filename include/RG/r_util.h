@@ -22,11 +22,14 @@
 
 namespace rg
 {
+	
 namespace util 
 {
-	//String
+	//String manip
+	//Split string
 	inline std::vector<std::string> splitStr(const std::string &str, const std::string &delimiter);
 
+	
 	/////////////////////////////Function Definition //////////////////////////////
 
 	std::vector<std::string> splitStr(const std::string &str, const std::string &delimiter)

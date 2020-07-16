@@ -1,4 +1,5 @@
 #!/bin/bash
 
-cp ../build/libRG.a RG/lib && cp -R ../include RG/include
+mkdir RG
+cp ../build/libRG.a RG/lib && cp -R ../include RG/
 echo "Updated RG" 

@@ -24,7 +24,7 @@ int main()
 	rg::RGraph::init();
 	rg::Texture T;
 
-	T.loadTexture("../res/rinc.bmp");
+	T.loadTexture("../res/rinc.png");
 	std::cout << "Started\n";
 	for (size_t i = 0; i < 3; i++)
 	{

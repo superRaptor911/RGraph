@@ -12,14 +12,14 @@ include_directories(${SDL2_IMAGE_INCLUDE_DIR})
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
 add_library(RG source/DirMan.cpp source/File.cpp source/RGraph.cpp
-  			source/Texture.cpp
+  			source/Texture.cpp source/Sprite.cpp
 )
 target_compile_options(RG PUBLIC -Wall -std=c++1z -lstdc++fs -o3 -s -lm)
 target_link_libraries(RG ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARY} stdc++fs)
 
 
 add_executable(SDL2Test main.cpp source/DirMan.cpp source/File.cpp
-			source/RGraph.cpp  source/Texture.cpp
+			source/RGraph.cpp  source/Texture.cpp source/Sprite.cpp
 )
 
 target_compile_options(SDL2Test PUBLIC -Wall -std=c++1z -lstdc++fs -g)

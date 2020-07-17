@@ -15,20 +15,29 @@
 #include <RG/r_util.h>
 #include <RG/File.h>
 #include <RG/DirMan.h>
+#include <RG/RGraph.h>
+#include <RG/Texture.h>
 
 
 int main()
 {
-	rg::File f;
-	f.open("test.txt", rg::File::READ, false);
-	auto strings = rg::util::splitStr(f.getFileContent()," ");
-	
-	for (auto &it : strings)
-		std::cout << it << "\n";
+	rg::RGraph::init();
+	rg::Texture T;
 
-	f.close();
+	T.loadTexture("../res/rinc.bmp");
+	std::cout << "Started\n";
+	for (size_t i = 0; i < 3; i++)
+	{
+		rg::RGraph::clearScreen();
+		T.draw(glm::vec2(100,100) * float(i));
+		rg::RGraph::updateScreen();
+		SDL_Delay(1000);
+	}
+	
+
+
 	std::cout << "Done";
-	exit(0);
+	/**exit(0);
 	SDL_Window *win = SDL_CreateWindow("Hello World!", 100, 100, 640, 480, SDL_WINDOW_SHOWN);
 	if (win == nullptr) {
 		std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
@@ -80,5 +89,6 @@ int main()
 	SDL_DestroyRenderer(ren);
 	SDL_DestroyWindow(win);
 	SDL_Quit();
+	return 0;*/
 	return 0;
 }

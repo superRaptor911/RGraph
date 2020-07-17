@@ -8,14 +8,13 @@ RGraph RGraph::_Rgraph_instance;
 
 bool RGraph::init(std::string win_name, glm::ivec2 win_size)
 {
-    auto instance = Instance();
+    auto &instance = _Rgraph_instance;
     if (instance._is_initiated)
     {
         printf("Already Initiated RGraph");
         return false;
     }
     
-
     // Init SDL
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
@@ -27,8 +26,8 @@ bool RGraph::init(std::string win_name, glm::ivec2 win_size)
     // Set window name and create window
     instance._win_name = win_name;
     instance._win_size = win_size;
-    instance._window = SDL_CreateWindow(win_name.c_str(), 100, 100, instance._win_size.x,
-                                        instance._win_size.y, SDL_WINDOW_SHOWN);
+    instance._window = SDL_CreateWindow(win_name.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 
+                                        instance._win_size.x, instance._win_size.y, SDL_WINDOW_SHOWN);
     
     // Show error message if failed to create window
     if (instance._window == nullptr)
@@ -37,9 +36,9 @@ bool RGraph::init(std::string win_name, glm::ivec2 win_size)
         SDL_Quit();
         return false;
     }
-
-    instance._renderer = SDL_CreateRenderer(instance._window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-
+    
+    instance._renderer = SDL_CreateRenderer(instance._window, -1, SDL_RENDERER_ACCELERATED);
+    
     // Show error message if failed to create renderer
     if (instance._renderer == nullptr)
     {
@@ -49,16 +48,27 @@ bool RGraph::init(std::string win_name, glm::ivec2 win_size)
         return false;  
     }
 
-
     instance._is_initiated = true;
 
     return true;
 }
 
+void RGraph::clearScreen()
+{
+    SDL_RenderClear(_Rgraph_instance._renderer);
+}
+
+void RGraph::updateScreen()
+{
+    SDL_RenderPresent(_Rgraph_instance._renderer);
+}
+
 RGraph::~RGraph()
 {
     // Destroy renderer , Window and Shut down SDL
-    SDL_DestroyRenderer(Instance()._renderer);
-    SDL_DestroyWindow(Instance()._window);
+    
+    //SDL_DestroyRenderer(getRenderer());
+    
+    SDL_DestroyWindow(getWindow());
     SDL_Quit();
 }

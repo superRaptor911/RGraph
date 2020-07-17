@@ -27,6 +27,7 @@ Texture::Texture(const Texture &T)
     *ref_count += 1;
 
     _texture = T._texture;
+    _size = T._size;
 }
 
 Texture &Texture::operator = (const Texture &T)
@@ -48,13 +49,14 @@ Texture &Texture::operator = (const Texture &T)
     *ref_count += 1;
 
     _texture = T._texture;
+    _size = T._size;
 
     return *this;
 }
 
 bool Texture::loadTexture(const std::string &path)
 {
-    _texture = IMG_LoadTexture(RGraph::Instance().getRenderer(), path.c_str());
+    _texture = IMG_LoadTexture(RGraph::getRenderer(), path.c_str());
 
     if (_texture == nullptr)
     {
@@ -70,6 +72,16 @@ bool Texture::loadTexture(const std::string &path)
 glm::ivec2 Texture::getSize() const
 {
     return _size;
+}
+
+void Texture::draw(glm::vec2 pos)
+{
+	SDL_Rect dst;
+	dst.x = pos.x;
+	dst.y = pos.y;
+	dst.w = _size.x;
+	dst.h = _size.y;
+	SDL_RenderCopy(RGraph::getRenderer(), _texture, NULL, &dst);
 }
 
 Texture::~Texture()

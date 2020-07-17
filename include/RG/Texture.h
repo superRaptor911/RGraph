@@ -34,6 +34,8 @@ namespace rg
 
         glm::ivec2 getSize() const;
 
+        void draw(glm::vec2 pos = glm::vec2(0,0));
+
         ~Texture();
     };    
 }

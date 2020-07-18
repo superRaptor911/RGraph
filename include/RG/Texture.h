@@ -1,8 +1,6 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
 #include <glm/glm.hpp>
 #include <string>
 
@@ -15,7 +13,6 @@ namespace rg
 
         glm::ivec2 _size;
 
-        SDL_Texture *_texture = nullptr;
 
         int *ref_count = nullptr;
 

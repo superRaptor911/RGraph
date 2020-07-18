@@ -4,4 +4,4 @@ doc/
 *.dll
 *.so
 *.a
-include/glm/
+*.pdf

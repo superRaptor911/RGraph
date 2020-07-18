@@ -9,7 +9,8 @@
             "intelliSenseMode": "clang-x64",
             "includePath": [
                 "${default}",
-                "${workspaceFolder}/include"
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/deps/include"
             ],
             "configurationProvider": "ms-vscode.cmake-tools"
         }

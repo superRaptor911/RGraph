@@ -40,7 +40,7 @@
 		{
 			"type": "shell",
 			"label": "C/C++: g++ build active file",
-			"command": "cd build && make && ./SDL2Test",
+			"command": "cd build && make -j4 && ./Rgraph",
 			"options": {
 				"cwd": "${workspaceFolder}"
 			},

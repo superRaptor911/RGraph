@@ -14,6 +14,8 @@
 
 #include <string>
 #include <vector>
+#include <chrono>
+#include <thread>
 
 // Macros
 #define R_CPRINT_ERR(msg) printf("Error in file %s:%d \n----------> %s\n",  __FILE__, __LINE__, msg);
@@ -22,12 +24,13 @@
 
 namespace rg
 {
-	
-namespace util 
-{
-	//String manip
-	//Split string
+	// String manip
+	// Split string
 	inline std::vector<std::string> splitStr(const std::string &str, const std::string &delimiter);
+
+	// Misc
+	//
+	inline void sleep(unsigned int m_sec);
 
 	
 	/////////////////////////////Function Definition //////////////////////////////
@@ -108,6 +111,12 @@ namespace util
 		delete[] token;
 		return rtn_val;
 	}
-}
+
+
+	void sleep(unsigned int m_sec)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(m_sec));
+	}
+
 }
 #endif

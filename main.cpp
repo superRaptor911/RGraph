@@ -21,6 +21,15 @@
 
 int main()
 {
+	typedef rg::RGraph Graph;
+	Graph::init();
+	Graph::setClearColor(rg::Color::Blue);
+
+	Graph::clearScreen();
+
+	Graph::updateScreen();
+
+	rg::sleep(2000);
 
 	std::cout << "Done";
 

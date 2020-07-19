@@ -31,7 +31,7 @@ std::string DirMan::getAliasPath(const std::string &alias)
  */
 bool DirMan::fileExists(const std::string &path)
 {
-	auto strings = rg::util::splitStr(path,">");
+	auto strings = rg::splitStr(path,">");
 	if (strings.size() > 1)
 		return fs::is_regular_file(getAliasPath(strings[0]) + "/" + strings[1] );
 	
@@ -48,7 +48,7 @@ bool DirMan::fileExists(const std::string &path)
  */
 bool DirMan::dirExists(const std::string &path)
 {
-	auto strings = rg::util::splitStr(path,">");
+	auto strings = rg::splitStr(path,">");
 	if (strings.size() > 1)
 		return fs::is_directory( getAliasPath(strings[0]) + "/" + strings[1] );
 	

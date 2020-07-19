@@ -10,14 +10,16 @@ namespace rg
     class Shader
     {
     private:
-        uint _vertex_shader;
-        uint _fragment_shader;
+        uint _vertex_shader = -1;
+        uint _fragment_shader = -1;
+        uint _shader_program = -1;
 
     public:
         Shader();
 
-        bool addVertexShaderSource(const std::string &src);
-        bool addFragmentShaderSource(const std::string &src);
+        bool addVertexShaderSource(const char *src);
+        bool addFragmentShaderSource(const char *src);
+        bool createShader();
 
         bool makeShader();
         ~Shader();

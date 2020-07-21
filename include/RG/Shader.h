@@ -38,7 +38,7 @@ namespace rg
         bool setParam(const std::string &param, const glm::vec2 &val);
 
         ~Shader();
-    };    
+    };
 }
 
 #endif

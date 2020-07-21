@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <glm/glm.hpp>
+#include <RG/Color.h>
 
 namespace rg
 {
@@ -19,6 +20,10 @@ namespace rg
         int *_ref_count = nullptr;
 
         std::unordered_map<std::string, int> _param_loc_cache;
+
+    private:
+
+        inline int _getUniformLocation(const std::string &param);
 
     public:
         Shader();
@@ -36,6 +41,9 @@ namespace rg
         bool setParam(const std::string &param, int val);
         bool setParam(const std::string &param, float val);
         bool setParam(const std::string &param, const glm::vec2 &val);
+        bool setParam(const std::string &param, const glm::vec3 &val);
+        bool setParam(const std::string &param, const glm::vec4 &val);
+        bool setParam(const std::string &param, const Color &val);
 
         ~Shader();
     };

@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#define Testing
 
 using namespace rg;
 
@@ -133,8 +134,83 @@ bool Shader::createShader()
     return true;
 }
 
- Shader::~Shader() 
- {
+int Shader::_getUniformLocation(const std::string &param)
+{
+    // Search cache first
+    auto it = _param_loc_cache.find(param);
+    if (it != _param_loc_cache.end())
+        return it->second;
+
+    #ifdef Testing
+        printf("Cache miss\n");
+    #endif
+    
+    // Get location
+    int uniform_loc = glGetUniformLocation(_shader_program, param.c_str());
+    // Check validity of location
+    if (uniform_loc == -1)
+    {
+        printf("Error: Uniform %s not found", param.c_str());
+        return uniform_loc;
+    }
+
+    // Add to cache
+    _param_loc_cache.insert(std::pair<std::string, int>(param, uniform_loc));
+
+    return uniform_loc;
+}
+
+bool Shader::setParam(const std::string &param, int val)
+{
+    int loc = _getUniformLocation(param);
+
+    if (loc != -1)
+        glUniform1i(loc, val);
+}
+
+
+bool Shader::setParam(const std::string &param, float val)
+{
+    int loc = _getUniformLocation(param);
+
+    if (loc != -1)
+        glUniform1f(loc, val);
+}
+
+bool Shader::setParam(const std::string &param, const glm::vec2 &val)
+{
+    int loc = _getUniformLocation(param);
+
+    if (loc != -1)
+        glUniform2f(loc, val.x, val.y);
+}
+
+bool Shader::setParam(const std::string &param, const glm::vec3 &val)
+{
+    int loc = _getUniformLocation(param);
+
+    if (loc != -1)
+        glUniform3f(loc, val.x, val.y, val.z);
+}
+
+bool Shader::setParam(const std::string &param, const glm::vec4 &val)
+{
+    int loc = _getUniformLocation(param);
+
+    if (loc != -1)
+        glUniform4f(loc, val.x, val.y, val.z, val.a);
+}
+
+bool Shader::setParam(const std::string &param, const Color &val)
+{
+    int loc = _getUniformLocation(param);
+
+    if (loc != -1)
+        glUniform4f(loc, val.r, val.g, val.b, val.a);
+}
+
+Shader::~Shader() 
+{
     if ((int)_fragment_shader != -1)
         glDeleteShader(_fragment_shader);
     
@@ -143,4 +219,4 @@ bool Shader::createShader()
 
     if ((int)_shader_program != -1)
         glDeleteProgram(_shader_program);
- }
+}

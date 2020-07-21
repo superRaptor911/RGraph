@@ -21,7 +21,6 @@
 
 
 
-
 int main()
 {
 	typedef rg::RGraph Graph;

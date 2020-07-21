@@ -144,7 +144,7 @@ int Shader::_getUniformLocation(const std::string &param)
     #ifdef Testing
         printf("Cache miss\n");
     #endif
-    
+
     // Get location
     int uniform_loc = glGetUniformLocation(_shader_program, param.c_str());
     // Check validity of location
@@ -160,7 +160,7 @@ int Shader::_getUniformLocation(const std::string &param)
     return uniform_loc;
 }
 
-bool Shader::setParam(const std::string &param, int val)
+void Shader::setParam(const std::string &param, int val)
 {
     int loc = _getUniformLocation(param);
 
@@ -169,7 +169,7 @@ bool Shader::setParam(const std::string &param, int val)
 }
 
 
-bool Shader::setParam(const std::string &param, float val)
+void Shader::setParam(const std::string &param, float val)
 {
     int loc = _getUniformLocation(param);
 
@@ -177,7 +177,7 @@ bool Shader::setParam(const std::string &param, float val)
         glUniform1f(loc, val);
 }
 
-bool Shader::setParam(const std::string &param, const glm::vec2 &val)
+void Shader::setParam(const std::string &param, const glm::vec2 &val)
 {
     int loc = _getUniformLocation(param);
 
@@ -185,7 +185,7 @@ bool Shader::setParam(const std::string &param, const glm::vec2 &val)
         glUniform2f(loc, val.x, val.y);
 }
 
-bool Shader::setParam(const std::string &param, const glm::vec3 &val)
+void Shader::setParam(const std::string &param, const glm::vec3 &val)
 {
     int loc = _getUniformLocation(param);
 
@@ -193,7 +193,7 @@ bool Shader::setParam(const std::string &param, const glm::vec3 &val)
         glUniform3f(loc, val.x, val.y, val.z);
 }
 
-bool Shader::setParam(const std::string &param, const glm::vec4 &val)
+void Shader::setParam(const std::string &param, const glm::vec4 &val)
 {
     int loc = _getUniformLocation(param);
 
@@ -201,7 +201,7 @@ bool Shader::setParam(const std::string &param, const glm::vec4 &val)
         glUniform4f(loc, val.x, val.y, val.z, val.a);
 }
 
-bool Shader::setParam(const std::string &param, const Color &val)
+void Shader::setParam(const std::string &param, const Color &val)
 {
     int loc = _getUniformLocation(param);
 

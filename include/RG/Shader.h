@@ -38,12 +38,12 @@ namespace rg
 
         void useShader();
 
-        bool setParam(const std::string &param, int val);
-        bool setParam(const std::string &param, float val);
-        bool setParam(const std::string &param, const glm::vec2 &val);
-        bool setParam(const std::string &param, const glm::vec3 &val);
-        bool setParam(const std::string &param, const glm::vec4 &val);
-        bool setParam(const std::string &param, const Color &val);
+        void setParam(const std::string &param, int val);
+        void setParam(const std::string &param, float val);
+        void setParam(const std::string &param, const glm::vec2 &val);
+        void setParam(const std::string &param, const glm::vec3 &val);
+        void setParam(const std::string &param, const glm::vec4 &val);
+        void setParam(const std::string &param, const Color &val);
 
         ~Shader();
     };

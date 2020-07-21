@@ -35,19 +35,7 @@ Shader::Shader(const char *vert_src, const char *frag_src)
 
 Shader &Shader::operator = (const Shader &shader)
 {
-    *_ref_count -= 1;
-
-    if (_ref_count == 0)
-    {
-        if ((int)_fragment_shader != -1)
-            glDeleteShader(_fragment_shader);
-        
-        if ((int)_vertex_shader != -1)
-            glDeleteShader(_vertex_shader);
-
-        if ((int)_shader_program != -1)
-            glDeleteProgram(_shader_program);
-    }
+    _decrementCount();
 
     _ref_count = shader._ref_count;
     *_ref_count += 1;
@@ -209,14 +197,28 @@ void Shader::setParam(const std::string &param, const Color &val)
         glUniform4f(loc, val.r, val.g, val.b, val.a);
 }
 
+void Shader::_decrementCount()
+{
+    // reduce count by 1
+    *_ref_count -= 1;
+
+    // Free resource if reference count is 1
+    if (_ref_count == 0)
+    {
+        if ((int)_fragment_shader != -1)
+            glDeleteShader(_fragment_shader);
+        
+        if ((int)_vertex_shader != -1)
+            glDeleteShader(_vertex_shader);
+
+        if ((int)_shader_program != -1)
+            glDeleteProgram(_shader_program);
+        
+        delete _ref_count;
+    }
+}
+
 Shader::~Shader() 
 {
-    if ((int)_fragment_shader != -1)
-        glDeleteShader(_fragment_shader);
-    
-    if ((int)_vertex_shader != -1)
-        glDeleteShader(_vertex_shader);
-
-    if ((int)_shader_program != -1)
-        glDeleteProgram(_shader_program);
+    _decrementCount();
 }

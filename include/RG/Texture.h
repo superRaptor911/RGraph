@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 #include <string>
+#include <RG/Global_Def.h>
 
 
 namespace rg
@@ -10,12 +11,15 @@ namespace rg
     class Texture
     {
     private:
-
+        uint _texture = RG_INVALID_ID;
         glm::ivec2 _size;
-
+        int _channels;
 
         int *ref_count = nullptr;
 
+    private:
+
+        inline void _decrementRefCount();
 
     public:
         
@@ -31,7 +35,7 @@ namespace rg
 
         glm::ivec2 getSize() const;
 
-        void draw(glm::vec2 pos = glm::vec2(0,0));
+        void genMipmap();
 
         ~Texture();
     };    

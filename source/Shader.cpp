@@ -50,7 +50,7 @@ Shader &Shader::operator = (const Shader &shader)
 
 bool Shader::addVertexShaderSource(const char *src)
 {
-    if ((int)_vertex_shader != -1)
+    if (_vertex_shader != RG_INVALID_ID)
         glDeleteShader(_vertex_shader);
     
     _vertex_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -65,7 +65,7 @@ bool Shader::addVertexShaderSource(const char *src)
     {
         glGetShaderInfoLog(_vertex_shader, 512, nullptr, infoLog);
         printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s", infoLog);
-        _vertex_shader = -1;
+        _vertex_shader = RG_INVALID_ID;
         return false;
     }
 
@@ -74,7 +74,7 @@ bool Shader::addVertexShaderSource(const char *src)
 
 bool Shader::addFragmentShaderSource(const char *src)
  {
-    if ((int)_fragment_shader != -1)
+    if (_fragment_shader != RG_INVALID_ID)
         glDeleteShader(_fragment_shader);
     
     _fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -89,7 +89,7 @@ bool Shader::addFragmentShaderSource(const char *src)
     {
         glGetShaderInfoLog(_fragment_shader, 512, nullptr, infoLog);
         printf("ERROR::SHADER::Fragment::COMPILATION_FAILED\n%s", infoLog);
-        _fragment_shader = -1;
+        _fragment_shader = RG_INVALID_ID;
         return false;
     }
 
@@ -98,7 +98,7 @@ bool Shader::addFragmentShaderSource(const char *src)
 
 bool Shader::createShader()
 {
-    if ((int)_shader_program != -1)
+    if (_shader_program != RG_INVALID_ID)
         glDeleteProgram(_shader_program);
 
     _shader_program = glCreateProgram();
@@ -115,7 +115,7 @@ bool Shader::createShader()
     {
         glGetProgramInfoLog(_shader_program, 512, NULL, infoLog);
         printf("ERROR::SHADER::LINKING_FAILED\n%s", infoLog);
-        _shader_program = -1;
+        _shader_program = RG_INVALID_ID;
         return false;
     }
 
@@ -205,13 +205,13 @@ void Shader::_decrementRefCount()
     // Free resource if reference count is 1
     if (_ref_count == 0)
     {
-        if ((int)_fragment_shader != -1)
+        if (_fragment_shader != RG_INVALID_ID)
             glDeleteShader(_fragment_shader);
         
-        if ((int)_vertex_shader != -1)
+        if (_vertex_shader != RG_INVALID_ID)
             glDeleteShader(_vertex_shader);
 
-        if ((int)_shader_program != -1)
+        if (_shader_program != RG_INVALID_ID)
             glDeleteProgram(_shader_program);
         
         delete _ref_count;

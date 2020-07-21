@@ -12,13 +12,6 @@
 #include <RG/r_util.h>
 #include <sstream>
 
-//#define ENABLE_DIRMAN
-
-
-#ifdef ENABLE_DIRMAN
-#include <RG/DirMan.h>
-#endif
-
 using namespace rg;
 
 bool File::open(const std::string &file_path, Fmode rwmode, bool binary, bool truncate)

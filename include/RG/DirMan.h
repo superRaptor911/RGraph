@@ -21,10 +21,11 @@ namespace rg
 	private:
 
 		inline static std::map<std::string, std::string> _alias_paths;
+		DirMan() {}
 
 	public:
 
-		DirMan() {}
+		
 
 		/**
 		 * @brief Get the Actual Path.
@@ -32,7 +33,7 @@ namespace rg
 		 * @param path 
 		 * @return std::string path
 		 */
-		std::string getAliasPath(const std::string &alias);
+		static std::string getAliasPath(const std::string &alias);
 
 		/**
 		 * @brief Check if file exists or not.
@@ -41,12 +42,14 @@ namespace rg
 		 * @return true if exits
 		 * @return false if not
 		 */
-		bool fileExists(const std::string &path);
+		static bool fileExists(const std::string &path);
+
+		static std::string getAbsolutePath(const std::string &path);
 
 
-		bool dirExists(const std::string &path);
+		static bool dirExists(const std::string &path);
 
-		void registerAlias(const std::string &alias, const std::string &path);
+		static void registerAlias(const std::string &alias, const std::string &path);
 
 	};
 

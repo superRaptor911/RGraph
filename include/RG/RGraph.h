@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <RG/Color.h>
+#include <RG/Shader.h>
 
 namespace rg
 {
@@ -29,6 +30,9 @@ namespace rg
 		RGraph() {}
 
 		static void handleWindowResize(GLFWwindow* window, int width, int height);
+
+	public:
+
 		
 	public:
 		

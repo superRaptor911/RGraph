@@ -21,6 +21,18 @@ std::string DirMan::getAliasPath(const std::string &alias)
 		return pair->second;
 }
 
+std::string DirMan::getAbsolutePath(const std::string &path)
+{
+	auto strings = splitStr(path, ">");
+	
+	if (strings.size() == 1)
+		return path;
+	
+	if (strings.size() == 2)
+		return getAliasPath(strings[0]) + "/" + strings[1];
+	
+	return "";
+}
 
 /**
  * @brief Check if file exists or not. "path" is alias path.

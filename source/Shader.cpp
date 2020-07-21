@@ -6,6 +6,59 @@
 
 using namespace rg;
 
+Shader::Shader()
+{
+    _ref_count = new int;
+    *_ref_count = 1;
+}
+
+Shader::Shader(const Shader &shader)
+{
+    _ref_count = shader._ref_count;
+    *_ref_count += 1;
+
+    _vertex_shader = shader._vertex_shader;
+    _fragment_shader = shader._fragment_shader;
+    _shader_program = shader._shader_program;
+    _param_loc_cache = shader._param_loc_cache;
+}
+
+Shader::Shader(const char *vert_src, const char *frag_src)
+{
+    _ref_count = new int;
+    *_ref_count = 1;
+
+    if (addVertexShaderSource(vert_src) && addFragmentShaderSource(frag_src))
+        createShader();
+}
+
+Shader &Shader::operator = (const Shader &shader)
+{
+    *_ref_count -= 1;
+
+    if (_ref_count == 0)
+    {
+        if ((int)_fragment_shader != -1)
+            glDeleteShader(_fragment_shader);
+        
+        if ((int)_vertex_shader != -1)
+            glDeleteShader(_vertex_shader);
+
+        if ((int)_shader_program != -1)
+            glDeleteProgram(_shader_program);
+    }
+
+    _ref_count = shader._ref_count;
+    *_ref_count += 1;
+
+    _vertex_shader = shader._vertex_shader;
+    _fragment_shader = shader._fragment_shader;
+    _shader_program = shader._shader_program;
+    _param_loc_cache = shader._param_loc_cache;
+
+    return *this; 
+}
+
 bool Shader::addVertexShaderSource(const char *src)
 {
     if ((int)_vertex_shader != -1)

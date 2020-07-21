@@ -16,6 +16,7 @@ include_directories(${CMAKE_SOURCE_DIR}/deps/include)
 #Library
 add_library(RG source/DirMan.cpp source/File.cpp deps/include/glad/glad.c 
 			source/RGraph.cpp source/Texture.cpp source/Sprite.cpp source/Color.cpp
+			source/Shader.cpp
 )
 target_compile_options(RG PUBLIC -Wall -std=c++1z -lstdc++fs -o3 -s -lm)
 target_link_libraries(RG glfw OpenGL::GL stdc++fs)
@@ -23,7 +24,7 @@ target_link_libraries(RG glfw OpenGL::GL stdc++fs)
 #For testing
 add_executable(Rgraph main.cpp source/DirMan.cpp deps/include/glad/glad.c 
 			source/File.cpp source/RGraph.cpp  source/Texture.cpp source/Sprite.cpp
-			source/Color.cpp
+			source/Color.cpp source/Shader.cpp
 )
 target_compile_options(Rgraph PUBLIC -Wall -std=c++1z -lstdc++fs -g)
 target_link_libraries(Rgraph glfw OpenGL::GL stdc++fs)

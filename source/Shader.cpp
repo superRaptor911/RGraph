@@ -1,9 +1,8 @@
 #include <RG/Shader.h>
-
+#include <RG/r_util.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#define Testing
 
 using namespace rg;
 
@@ -129,9 +128,7 @@ int Shader::_getUniformLocation(const std::string &param)
     if (it != _param_loc_cache.end())
         return it->second;
 
-    #ifdef Testing
-        printf("Cache miss\n");
-    #endif
+    DEBUG_PRINT("shader Cache miss");
 
     // Get location
     int uniform_loc = glGetUniformLocation(_shader_program, param.c_str());
@@ -203,7 +200,7 @@ void Shader::_decrementRefCount()
     *_ref_count -= 1;
 
     // Free resource if reference count is 1
-    if (_ref_count == 0)
+    if (*_ref_count == 0)
     {
         if (_fragment_shader != RG_INVALID_ID)
             glDeleteShader(_fragment_shader);
@@ -214,6 +211,7 @@ void Shader::_decrementRefCount()
         if (_shader_program != RG_INVALID_ID)
             glDeleteProgram(_shader_program);
         
+        DEBUG_PRINT("Deleting shader");
         delete _ref_count;
     }
 }

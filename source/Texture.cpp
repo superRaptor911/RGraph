@@ -1,6 +1,7 @@
 #include <RG/Texture.h>
 #include <RG/RGraph.h>
 #include <RG/DirMan.h>
+#include <RG/r_util.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -98,20 +99,27 @@ glm::ivec2 Texture::getSize() const
     return _size;
 }
 
+void Texture::setAsActive(int id)
+{
+    glActiveTexture(GL_TEXTURE0 + id);
+    glBindTexture(GL_TEXTURE_2D, _texture);
+}
 
 void Texture::_decrementRefCount()
 {
     // Reduce ref by 1
     *ref_count -= 1;
 
-    // Delete resource if ref count reaches 0
-    if (ref_count == 0)
+    // Delete resource if value of ref count reaches 0
+    if (*ref_count == 0)
     {
         delete ref_count;
 
         // Destroy Texture if exists
         if (_texture != RG_INVALID_ID)
             glDeleteTextures(1, &_texture);
+
+        DEBUG_PRINT("Deleting Texture");
     }
 }
 

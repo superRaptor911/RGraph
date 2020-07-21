@@ -17,21 +17,30 @@
 #include <RG/DirMan.h>
 #include <RG/RGraph.h>
 #include <RG/Texture.h>
+#include <RG/Shader.h>
+
+
 
 
 int main()
 {
 	typedef rg::RGraph Graph;
 	Graph::init();
+	rg::Texture s,s2;
+	s = s2;
+	for (size_t i = 0; i < 5; i++)
+	{
+		rg::Texture ss;
+		s2 = ss;
+		rg::Texture sss=s;
+	}
+	
 	Graph::setClearColor(rg::Color::Blue);
-
 	Graph::clearScreen();
-
 	Graph::updateScreen();
-
 	rg::sleep(2000);
 
-	std::cout << "Done";
+	std::cout << "Done\n";
 
 	/**rg::RGraph::init();
 	rg::Texture T;

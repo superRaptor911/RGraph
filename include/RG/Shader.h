@@ -24,6 +24,11 @@ namespace rg
     private:
 
         inline int _getUniformLocation(const std::string &param);
+        inline void _decrementRefCount();
+    
+    public:
+
+        static Shader DefaultShader;
 
     public:
         Shader();
@@ -36,14 +41,14 @@ namespace rg
         bool addFragmentShaderSource(const char *src);
         bool createShader();
 
-        void useShader();
-
         void setParam(const std::string &param, int val);
         void setParam(const std::string &param, float val);
         void setParam(const std::string &param, const glm::vec2 &val);
         void setParam(const std::string &param, const glm::vec3 &val);
         void setParam(const std::string &param, const glm::vec4 &val);
         void setParam(const std::string &param, const Color &val);
+
+        void useShader();
 
         ~Shader();
     };

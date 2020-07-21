@@ -35,7 +35,7 @@ Shader::Shader(const char *vert_src, const char *frag_src)
 
 Shader &Shader::operator = (const Shader &shader)
 {
-    _decrementCount();
+    _decrementRefCount();
 
     _ref_count = shader._ref_count;
     *_ref_count += 1;
@@ -197,7 +197,7 @@ void Shader::setParam(const std::string &param, const Color &val)
         glUniform4f(loc, val.r, val.g, val.b, val.a);
 }
 
-void Shader::_decrementCount()
+void Shader::_decrementRefCount()
 {
     // reduce count by 1
     *_ref_count -= 1;
@@ -218,7 +218,12 @@ void Shader::_decrementCount()
     }
 }
 
+void Shader::useShader()
+{
+    glUseProgram(_shader_program);
+}
+
 Shader::~Shader() 
 {
-    _decrementCount();
+    _decrementRefCount();
 }

@@ -47,7 +47,7 @@ namespace rg
 		}
 
 		// Reserve vector size for performance
-		rtn_val.reserve(std::min(str.size() / delimiter.size() + 1, 100000UL));
+		rtn_val.reserve(std::min(str.size() / delimiter.size() + 1, size_t(100000)));
 		
 		// Allocate memory
 		char *token = new char[str.size() + 1];

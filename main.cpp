@@ -18,6 +18,7 @@
 #include <RG/RGraph.h>
 #include <RG/Texture.h>
 #include <RG/Shader.h>
+#include <RG/Sprite.h>
 
 
 
@@ -25,14 +26,22 @@ int main()
 {
 	typedef rg::RGraph Graph;
 	Graph::init();
-	rg::Texture s,s2;
-	s = s2;
-	for (size_t i = 0; i < 5; i++)
-	{
-		rg::Texture ss;
-		s2 = ss;
-		rg::Texture sss=s;
-	}
+	rg::File f;
+	f.open("../res/default.vs",rg::File::READ);
+	std::string v = f.getFileContent();
+	f.open("../res/default.fs",rg::File::READ);
+	std::string fr = f.getFileContent();
+	
+	const char *src = fr.c_str();
+    GLuint vertex = glCreateShader(GL_VERTEX_SHADER);
+    //glShaderSource(vertex, 1, &src, NULL);
+    glCompileShader(vertex);
+
+	return 0;
+
+	//rg::Shader s(v.c_str(), fr.c_str());
+
+
 	
 	Graph::setClearColor(rg::Color::Blue);
 	Graph::clearScreen();

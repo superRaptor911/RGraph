@@ -22,16 +22,19 @@ namespace rg
 
         inline static const float _vertex_data[] = {
             // positions         // texture coords
-             0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // top right
-             0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // bottom right
-            -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // bottom left
-            -0.5f,  0.5f, 0.0f,   0.0f, 1.0f  // top left 
+             0.5f,  0.5f,   1.0f, 1.0f, // top right
+             0.5f, -0.5f,   1.0f, 0.0f, // bottom right
+            -0.5f, -0.5f,   0.0f, 0.0f, // bottom left
+            -0.5f,  0.5f,   0.0f, 1.0f  // top left 
         };
 
         inline static const uint _indices[] = {
             0, 1, 3, // first triangle
             1, 2, 3  // second triangle
         };
+
+        // Shader _default_shader = Shader("#version 330 core\nlayout (location = 0) in vec2 aPos;\nlayout (location = 1) in vec2 aTexCoord;\nout vec2 TexCoord;\nvoid main()\n{\ngl_Position = vec4(aPos, 0.0, 1.0);\nTexCoord = vec2(aTexCoord.x, aTexCoord.y);\n}",
+          //                                            "#version 330 core\nout vec4 FragColor;\nin vec2 TexCoord;\nuniform sampler2D texture1;\nvoid main()\n{\nFragColor = texture(texture1, TexCoord);\n}");
 
     private:
 

@@ -43,6 +43,12 @@ namespace rg
          */
         bool dettachRefCount()
         {
+            if (_ref_count == nullptr)
+            {
+                printf("Error::REF_BASE: dettaching to null ref!. Op failed Memory will leak\n");
+                return false;
+            }
+            
             PTR_VAL(_ref_count) -= 1;
 
             if (PTR_VAL(_ref_count) == 0)

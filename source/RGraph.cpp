@@ -71,7 +71,10 @@ void RGraph::updateScreen()
     glfwSwapBuffers(_Rgraph_instance._window);
 }
 
+#include <RG/Global_Def.h>
+
 RGraph::~RGraph()
 {
- glfwTerminate();
+    DEBUG_PRINT("RGraph shutdown");
+    glfwTerminate();
 }

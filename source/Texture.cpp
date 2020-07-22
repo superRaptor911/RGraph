@@ -11,24 +11,20 @@ using namespace rg;
 Texture::Texture()
 {
     // Start Reference counting
-    ref_count = new int;
-    *ref_count = 1;
+    startRefCounting();
 }
 
 Texture::Texture(const std::string &path)
 {
     // Start Reference counting
-    ref_count = new int;
-    *ref_count = 1;
-
+    startRefCounting();
     loadTexture(path);
 }
 
 Texture::Texture(const Texture &T)
 {
     // Do ref counting
-    ref_count = T.ref_count;
-    *ref_count += 1;
+    attachToRefCount(T);
     // copy Texture id
     _texture = T._texture;
     //Copy size
@@ -40,8 +36,7 @@ Texture &Texture::operator = (const Texture &T)
     // Decrement ref count and delete Texture if ref vount reaches 0
     _decrementRefCount();
     // Do ref counting
-    ref_count = T.ref_count;
-    *ref_count += 1;
+    attachToRefCount(T);
 
     // copy Texture id
     _texture = T._texture;
@@ -54,7 +49,7 @@ Texture &Texture::operator = (const Texture &T)
 bool Texture::loadTexture(const std::string &path)
 {
     stbi_set_flip_vertically_on_load(true); 
-    uchar *data = stbi_load(DirMan::getAliasPath(path).c_str(), &_size.x, &_size.y, &_channels, 0);
+    uchar *data = stbi_load(path.c_str(), &_size.x, &_size.y, &_channels, 0);
 
     // Texture was used before
     if (_texture != RG_INVALID_ID)
@@ -85,12 +80,12 @@ bool Texture::loadTexture(const std::string &path)
     }
     else
     {
-        printf("Error::Failed to load texture %s\n", DirMan::getAliasPath(path).c_str());
+       // printf("Error::Failed to load texture %s\n", DirMan::getAliasPath(path).c_str());
         stbi_image_free(data);
         return false;
     }
 
-    stbi_image_free(data);   
+    //stbi_image_free(data);   
     return true;
 }
 
@@ -107,14 +102,9 @@ void Texture::setAsActive(int id)
 
 void Texture::_decrementRefCount()
 {
-    // Reduce ref by 1
-    *ref_count -= 1;
-
     // Delete resource if value of ref count reaches 0
-    if (*ref_count == 0)
+    if (dettachRefCount())
     {
-        delete ref_count;
-
         // Destroy Texture if exists
         if (_texture != RG_INVALID_ID)
             glDeleteTextures(1, &_texture);

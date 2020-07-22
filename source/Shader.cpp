@@ -24,13 +24,8 @@ Shader::Shader(const char *vert_src, const char *frag_src)
 {
     startRefCounting();
 
-    DEBUG_PRINT("Adding vertex and fragment shader");
-
-    addFragmentShaderSource(frag_src);
-    return;
     if (addVertexShaderSource(vert_src) && addFragmentShaderSource(frag_src))
         createShader();
-
 }
 
 Shader &Shader::operator = (const Shader &shader)
@@ -46,40 +41,29 @@ Shader &Shader::operator = (const Shader &shader)
     return *this; 
 }
 
-bool Shader::_chkError(uint id, const std::string &type)
+bool Shader::_chkError(uint &id, const std::string &type)
 {
     GLint success;
     GLchar infoLog[1024];
-    if(type != "PROGRAM")
+    glGetShaderiv(id, GL_COMPILE_STATUS, &success);
+    
+    if(!success)
     {
-        glGetShaderiv(id, GL_COMPILE_STATUS, &success);
-        if(!success)
-        {
-            glGetShaderInfoLog(id, 1024, NULL, infoLog);
-            printf("ERROR::SHADER_COMPILATION_ERROR of type: %s\n%s----------------\n", type.c_str() ,infoLog);
-            return false;
-        }
-
-    }
-    else
-    {
-        glGetProgramiv(id, GL_LINK_STATUS, &success);
-        if(!success)
-        {
-            glGetProgramInfoLog(id, 1024, NULL, infoLog);
-            printf("ERROR::PROGRAM_LINKING_ERROR of type: %s\n%s----------------\n", type.c_str() ,infoLog);
-            return false;
-        }
+        glGetShaderInfoLog(id, 1024, NULL, infoLog);
+        printf("ERROR:: %s shader.\n%s----------------\n", type.c_str() ,infoLog);
+        id = RG_INVALID_ID;
     }
 
-    return false;
+    return success;
 }
 
 bool Shader::addVertexShaderSource(const char *src)
 {
-/*    if (_vertex_shader != RG_INVALID_ID)
-        glDeleteShader(_vertex_shader);*/
+    // Delete shader if already exists
+    if (_vertex_shader != RG_INVALID_ID)
+        glDeleteShader(_vertex_shader);
     
+    // create new shader
     _vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(_vertex_shader, 1, &src, nullptr);
     glCompileShader(_vertex_shader);
@@ -89,14 +73,10 @@ bool Shader::addVertexShaderSource(const char *src)
 
 bool Shader::addFragmentShaderSource(const char *src)
  {
-/*    if (_fragment_shader != RG_INVALID_ID)
-        glDeleteShader(_fragment_shader);*/
+    // Delete shader if already exists
+    if (_fragment_shader != RG_INVALID_ID)
+        glDeleteShader(_fragment_shader);
 
-      GLuint vertex = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertex, 1, &src, NULL);
-        glCompileShader(vertex);    
-
-    return false;
     _fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(_fragment_shader, 1, &src, nullptr);
     glCompileShader(_fragment_shader);
@@ -106,8 +86,9 @@ bool Shader::addFragmentShaderSource(const char *src)
 
 bool Shader::createShader()
 {
-/*    if (_shader_program != RG_INVALID_ID)
-        glDeleteProgram(_shader_program);*/
+    // Delete program if already exists
+    if (_shader_program != RG_INVALID_ID)
+        glDeleteProgram(_shader_program);
 
     _shader_program = glCreateProgram();
 
@@ -115,18 +96,13 @@ bool Shader::createShader()
     glAttachShader(_shader_program, _fragment_shader);
     glLinkProgram(_shader_program);
 
-    //if (_fragment_shader != RG_INVALID_ID)
-    glDeleteShader(_fragment_shader);
-        
-    ///if (_vertex_shader != RG_INVALID_ID)
-    glDeleteShader(_vertex_shader);
-
-
-    return _chkError(_shader_program, "PROGRAM");
+    return _chkError(_shader_program, "Linking");
 }
 
 int Shader::_getUniformLocation(const std::string &param)
 {
+    // Set as current shader
+    glUseProgram(_shader_program);
     // Search cache first
     auto it = _param_loc_cache.find(param);
     if (it != _param_loc_cache.end())
@@ -203,7 +179,6 @@ void Shader::_decrementRefCount()
     // Free resource if reference count is 1
     if (dettachRefCount())
     {
-        return;
         if (_fragment_shader != RG_INVALID_ID)
             glDeleteShader(_fragment_shader);
         
@@ -224,6 +199,5 @@ void Shader::useShader()
 
 Shader::~Shader() 
 {
-    printf("called destuctor\n");
     _decrementRefCount();
 }

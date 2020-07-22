@@ -22,7 +22,7 @@ namespace rg
 
         inline int _getUniformLocation(const std::string &param);
         inline void _decrementRefCount();
-        bool _chkError(uint id, const std::string &type);
+        bool _chkError(uint &id, const std::string &type);
     
     public:
 

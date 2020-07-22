@@ -76,5 +76,5 @@ void RGraph::updateScreen()
 RGraph::~RGraph()
 {
     DEBUG_PRINT("RGraph shutdown");
-    glfwTerminate();
+    //glfwTerminate();
 }

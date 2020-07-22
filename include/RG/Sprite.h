@@ -33,9 +33,6 @@ namespace rg
             1, 2, 3  // second triangle
         };
 
-        // Shader _default_shader = Shader("#version 330 core\nlayout (location = 0) in vec2 aPos;\nlayout (location = 1) in vec2 aTexCoord;\nout vec2 TexCoord;\nvoid main()\n{\ngl_Position = vec4(aPos, 0.0, 1.0);\nTexCoord = vec2(aTexCoord.x, aTexCoord.y);\n}",
-          //                                            "#version 330 core\nout vec4 FragColor;\nin vec2 TexCoord;\nuniform sampler2D texture1;\nvoid main()\n{\nFragColor = texture(texture1, TexCoord);\n}");
-
     private:
 
         inline void _decrementRefCount();

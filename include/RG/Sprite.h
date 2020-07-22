@@ -3,15 +3,14 @@
 
 #include <RG/Texture.h>
 #include <RG/Shader.h>
-#include <RG/Global_Def.h>
+#include <RG/Ref_Base.h>
 
 namespace rg
 {
-    class Sprite
+    class Sprite : public Ref_Base
     {
     private:
 
-        int _ref_count;
         Texture _texture;
         glm::vec2 _scale = glm::vec2(1.f, 1.f);
         // Position of sprite
@@ -19,7 +18,7 @@ namespace rg
         // Origin of sprite
         glm::vec2 _origin;
 
-        uint _VA0, _VBO, _IBO;
+        uint _VAO, _VBO, _EBO;
 
         inline static const float _vertex_data[] = {
             // positions         // texture coords
@@ -34,11 +33,19 @@ namespace rg
             1, 2, 3  // second triangle
         };
 
+    private:
+
+        inline void _decrementRefCount();
+
     public:
 
-        Sprite() {};
+        Sprite();
 
         Sprite(const Texture &T);
+
+        Sprite(const Sprite &S);
+
+        Sprite &operator = (const Sprite &S);
 
         Texture getTexture() const {return _texture;}
 
@@ -54,7 +61,7 @@ namespace rg
 
         void draw();
 
-        ~Sprite() {};
+        ~Sprite();
     };
     
 }

@@ -7,6 +7,8 @@ namespace rg
     typedef unsigned char uchar;
     const uint RG_INVALID_ID = 0;
 
+    // Macro to get value of pointer
+    #define PTR_VAL(x) *x
 }
 
 #endif

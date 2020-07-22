@@ -3,19 +3,16 @@
 
 #include <glm/glm.hpp>
 #include <string>
-#include <RG/Global_Def.h>
-
+#include <RG/Ref_Base.h>
 
 namespace rg
 {
-    class Texture
+    class Texture : public Ref_Base
     {
     private:
         uint _texture = RG_INVALID_ID;
         glm::ivec2 _size;
         int _channels;
-
-        int *ref_count = nullptr;
 
     private:
 

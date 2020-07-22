@@ -5,18 +5,16 @@
 #include <unordered_map>
 #include <glm/glm.hpp>
 #include <RG/Color.h>
-#include <RG/Global_Def.h>
+#include <RG/Ref_Base.h>
 
 namespace rg
 {
-    class Shader
+    class Shader : public Ref_Base
     {
     private:
         uint _vertex_shader = RG_INVALID_ID;
         uint _fragment_shader = RG_INVALID_ID;
         uint _shader_program = RG_INVALID_ID;
-
-        int *_ref_count = nullptr;
 
         std::unordered_map<std::string, int> _param_loc_cache;
 

@@ -25,11 +25,18 @@ namespace rg
 
 		Color _clear_color;
 
+		typedef void (*RgCloseFunc);
+
+		RgCloseFunc _close_callback_func = nullptr;
+
 	private:
 
 		RGraph() {}
 
-		static void handleWindowResize(GLFWwindow* window, int width, int height);
+		static void _handleWindowResize(GLFWwindow* window, int width, int height);
+
+		static void _handleCloseButtonPressed(GLFWwindow * window);
+
 
 	public:
 
@@ -42,10 +49,17 @@ namespace rg
 		static void setClearColor(const Color &c_color);
 		static Color getClearColor() { return _Rgraph_instance._clear_color;}
 
+		static GLFWwindow* getWindow() {return _Rgraph_instance._window;}
 
 		static void clearScreen();
 
 		static void updateScreen();
+
+		static bool windowOpen();
+
+		static void pollEvents() { glfwPollEvents();}
+
+		static void setCloseCallback(RgCloseFunc func);
 
 		~RGraph();
 	};

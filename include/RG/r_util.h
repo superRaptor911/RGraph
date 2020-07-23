@@ -36,7 +36,7 @@ namespace rg
 	// String manip
 	// Split string
 	inline std::vector<std::string> splitStr(const std::string &str, const std::string &delimiter);
-
+	inline std::string toUpper(std::string str);
 	// Misc
 	//
 	inline void sleep(unsigned int m_sec);
@@ -119,6 +119,13 @@ namespace rg
 		// De-allocate memory
 		delete[] token;
 		return rtn_val;
+	}
+
+
+	std::string toUpper(std::string str)
+	{
+		for (auto & c: str) c = toupper(c);
+		return str;
 	}
 
 

@@ -33,7 +33,8 @@ bool RGraph::init(std::string win_name, glm::ivec2 win_size)
     // Set at current context
     glfwMakeContextCurrent(instance._window);
     // Handle Window resize
-    glfwSetFramebufferSizeCallback(instance._window, handleWindowResize);
+    glfwSetFramebufferSizeCallback(instance._window, _handleWindowResize);
+    glfwSetWindowCloseCallback(instance._window, _handleCloseButtonPressed);
 
     // Load all opengl function pointer
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -45,13 +46,20 @@ bool RGraph::init(std::string win_name, glm::ivec2 win_size)
     return true;
 }
 
-void RGraph::handleWindowResize(GLFWwindow* window, int width, int height)
+void RGraph::_handleWindowResize(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
 
     // Change size
     _Rgraph_instance._win_size = glm::ivec2(width, height);
 }
+
+
+void RGraph::_handleCloseButtonPressed(GLFWwindow * window)
+{
+    exit(0);
+}
+
 
 void RGraph::setClearColor(const Color &c_color)
 { 
@@ -70,6 +78,13 @@ void RGraph::updateScreen()
 {
     glfwSwapBuffers(_Rgraph_instance._window);
 }
+
+bool RGraph::windowOpen() 
+{
+    return !glfwWindowShouldClose(_Rgraph_instance._window);
+}
+
+
 
 #include <RG/Global_Def.h>
 

@@ -13,6 +13,9 @@
 #include <iostream>
 #include <RG/RGraph.h>
 #include <RG/Sprite.h>
+#include <RG/File.h>
+#include <RG/r_util.h>
+#include <RG/Keyboard.h>
 
 using namespace rg;
 
@@ -20,13 +23,23 @@ int main()
 {
 	
 	RGraph::init();
-	rg::Sprite sprite(Texture("../res/rinc.png"));	
+	Sprite sprite(Texture("../res/rinc.png"));	
 	RGraph::setClearColor(Color::Blue);
 
-	RGraph::clearScreen();
-	sprite.draw();
-	RGraph::updateScreen();
+	while (RGraph::windowOpen())
+	{
+		RGraph::clearScreen();
+		sprite.draw();
+
+		if (Keyboard::isKeyPressed("c"))
+		{
+			std::cout<< "Whooo\n";
+		}
+		
+
+		RGraph::updateScreen();
+		RGraph::pollEvents();
+	}
 	
-	std::cin.get();
 	return 0;
 }

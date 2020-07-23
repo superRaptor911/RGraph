@@ -126,8 +126,12 @@ void Sprite::draw()
         "}\n"
         ); 
 
-    _texture.setAsActive();
-   _default_shader.useShader();
+    if (_custom_shader.isReady())
+        _custom_shader.activate();
+    else
+        _default_shader.activate();
+    
+    _texture.activate();
     glBindVertexArray(_VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _EBO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

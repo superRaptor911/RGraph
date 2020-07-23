@@ -46,7 +46,8 @@ namespace rg
         void setParam(const std::string &param, const glm::vec4 &val);
         void setParam(const std::string &param, const Color &val);
 
-        void useShader();
+        bool isReady() { return _shader_program != RG_INVALID_ID;}
+        void activate();
 
         ~Shader();
     };

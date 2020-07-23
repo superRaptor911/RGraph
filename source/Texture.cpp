@@ -94,7 +94,7 @@ glm::ivec2 Texture::getSize() const
     return _size;
 }
 
-void Texture::setAsActive(int id)
+void Texture::activate(int id)
 {
     glActiveTexture(GL_TEXTURE0 + id);
     glBindTexture(GL_TEXTURE_2D, _texture);

@@ -11,32 +11,22 @@
 
 
 #include <iostream>
-#include <RG/cleanup.h>
-#include <RG/r_util.h>
-#include <RG/File.h>
-#include <RG/DirMan.h>
 #include <RG/RGraph.h>
-#include <RG/Texture.h>
-#include <RG/Shader.h>
 #include <RG/Sprite.h>
 
-
+using namespace rg;
 
 int main()
 {
-	typedef rg::RGraph Graph;
-	Graph::init();
-	rg::File f;
-	rg::Sprite s;
-	rg::Texture t("../res/rinc.png");
-	s.setTexture(t);
-	Graph::setClearColor(rg::Color::Blue);
-	Graph::clearScreen();
-	s.draw();
-	Graph::updateScreen();
-	rg::sleep(2000);
+	
+	RGraph::init();
+	rg::Sprite sprite(Texture("../res/rinc.png"));	
+	RGraph::setClearColor(Color::Blue);
 
-	std::cout << "Done\n";
-
+	RGraph::clearScreen();
+	sprite.draw();
+	RGraph::updateScreen();
+	
+	std::cin.get();
 	return 0;
 }

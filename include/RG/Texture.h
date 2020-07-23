@@ -39,7 +39,7 @@ namespace rg
         void genMipmap();
 
         // set as current texture for draw call
-        void setAsActive(int id = 0);
+        void activate(int id = 0);
 
 
         ~Texture();

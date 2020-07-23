@@ -51,6 +51,12 @@ bool Shader::_chkError(uint &id, const std::string &type)
     {
         glGetShaderInfoLog(id, 1024, NULL, infoLog);
         printf("ERROR:: %s shader.\n%s----------------\n", type.c_str() ,infoLog);
+
+        if (type == "Linking")
+            glDeleteProgram(id);
+        else
+            glDeleteShader(id);
+        
         id = RG_INVALID_ID;
     }
 
@@ -192,7 +198,7 @@ void Shader::_decrementRefCount()
     }
 }
 
-void Shader::useShader()
+void Shader::activate()
 {
     glUseProgram(_shader_program);
 }

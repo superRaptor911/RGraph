@@ -52,10 +52,12 @@ namespace rg
     public:
         
         static bool isKeyPressed(const std::string &key);
-        static bool isKeyPressed(const int i);
+        static bool isKeyPressed(const int key_id);
         
         static bool isKeyReleased(const std::string &key);
-        static bool isKeyReleased(const int i);
+        static bool isKeyReleased(const int key_id);
+
+
 
     };    
 }

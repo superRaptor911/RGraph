@@ -13,8 +13,10 @@ namespace rg
 	class RGraph
 	{
 	private:
-
+		// Window size
 		glm::ivec2 _win_size;
+		// Screen resolution
+		glm::vec2 _resolution;
 
 		GLFWwindow* _window;
 
@@ -48,6 +50,9 @@ namespace rg
 
 		static void setClearColor(const Color &c_color);
 		static Color getClearColor() { return _Rgraph_instance._clear_color;}
+
+		static void setResolution(const glm::vec2 &res) { _Rgraph_instance._resolution = res;}
+		static glm::vec2 getResolution() {return _Rgraph_instance._resolution;}
 
 		static GLFWwindow* getWindow() {return _Rgraph_instance._window;}
 

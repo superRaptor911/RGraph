@@ -44,6 +44,7 @@ namespace rg
         void setParam(const std::string &param, const glm::vec2 &val);
         void setParam(const std::string &param, const glm::vec3 &val);
         void setParam(const std::string &param, const glm::vec4 &val);
+        void setParam(const std::string &param, const glm::mat4 &val);
         void setParam(const std::string &param, const Color &val);
 
         bool isReady() { return _shader_program != RG_INVALID_ID;}

@@ -3,6 +3,10 @@
 #include <GLFW/glfw3.h>
 #include <RG/r_util.h>
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+
 using namespace rg;
 
 Sprite::Sprite()
@@ -37,6 +41,7 @@ Sprite::Sprite(const Texture &T)
     startRefCounting();
     // Set Texture
     _texture = T;
+    _origin = glm::vec2(T.getSize()) / 2.f;
 
     glGenVertexArrays(1, &_VAO);
     glGenBuffers(1, &_VBO);
@@ -106,11 +111,13 @@ void Sprite::draw()
         "layout (location = 1) in vec2 aTexCoord;\n"
 
         "out vec2 TexCoord;\n"
+        "uniform mat4 model;\n"
+        "uniform mat4 proj;\n"
 
         "void main()\n"
         "{\n"
-        " gl_Position = vec4(aPos, 0.0, 1.0);\n"
-        " TexCoord = vec2(aTexCoord.x, aTexCoord.y);\n"
+        " gl_Position = proj * model * vec4(aPos, 0.0, 1.0);\n"
+        " TexCoord = aTexCoord;\n"
         "}\n",
 
         "#version 330 core\n"
@@ -124,8 +131,21 @@ void Sprite::draw()
         "{\n"
         "	FragColor = texture(texture1, TexCoord);\n"
         "}\n"
-        ); 
+        );
 
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(_position , 0.0f));
+
+    model = glm::translate(model, glm::vec3(_origin, 0.0f)); 
+    model = glm::rotate(model, _rotation, glm::vec3(0.0f, 0.0f, 1.0f)); 
+    model = glm::translate(model, glm::vec3(-_origin, 0.0f));
+
+    model = glm::scale(model, glm::vec3(glm::vec2(_texture.getSize()) * _scale, 1.0f)); 
+    
+    _default_shader.setParam("proj", glm::ortho(0.0f, 640.0f, 480.0f, 0.0f, -1.0f, 1.0f));
+
+    _default_shader.setParam("model", model);
+    
     if (_custom_shader.isReady())
         _custom_shader.activate();
     else

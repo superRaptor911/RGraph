@@ -31,11 +31,26 @@ int main()
 		RGraph::clearScreen();
 		sprite.draw();
 
-		if (Keyboard::isKeyPressed("c"))
-		{
-			std::cout<< "Whooo\n";
-		}
+		if (Keyboard::isKeyPressed("w"))
+			sprite.move(glm::vec2(0,-1) * 5.f);
 		
+		if (Keyboard::isKeyPressed("s"))
+			sprite.move(glm::vec2(0,1) * 5.f);
+
+		if (Keyboard::isKeyPressed("a"))
+			sprite.move(glm::vec2(-1,0) * 5.f);
+
+		if (Keyboard::isKeyPressed("d"))
+			sprite.move(glm::vec2(1,0) * 5.f);
+
+		if (Keyboard::isKeyPressed("x"))
+			sprite.rotate(0.02);
+
+		if (Keyboard::isKeyPressed("z"))
+			sprite.rotate(-0.02);
+
+		if (Keyboard::isKeyPressed("p"))
+			std::cout<< sprite.getOrigin().x << "," << sprite.getPosition().y << "\n";
 
 		RGraph::updateScreen();
 		RGraph::pollEvents();

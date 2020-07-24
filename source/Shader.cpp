@@ -121,7 +121,7 @@ int Shader::_getUniformLocation(const std::string &param)
     // Check validity of location
     if (uniform_loc == -1)
     {
-        printf("Error: Uniform %s not found", param.c_str());
+        printf("Error: Uniform %s not found\n", param.c_str());
         return uniform_loc;
     }
 
@@ -170,6 +170,15 @@ void Shader::setParam(const std::string &param, const glm::vec4 &val)
 
     if (loc != -1)
         glUniform4f(loc, val.x, val.y, val.z, val.a);
+}
+
+
+void Shader::setParam(const std::string &param, const glm::mat4 &val)
+{
+    int loc = _getUniformLocation(param);
+
+    if (loc != -1)
+        glUniformMatrix4fv(loc, 1, GL_FALSE, &val[0][0]);
 }
 
 void Shader::setParam(const std::string &param, const Color &val)

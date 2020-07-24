@@ -13,9 +13,9 @@ bool Keyboard::isKeyPressed(const std::string &key)
     return (glfwGetKey(RGraph::getWindow(),it->second) == GLFW_PRESS);
 }
 
-bool Keyboard::isKeyPressed(const int i)
+bool Keyboard::isKeyPressed(const int key_id)
 {
-    return (glfwGetKey(RGraph::getWindow(), i) == GLFW_PRESS);
+    return (glfwGetKey(RGraph::getWindow(), key_id) == GLFW_PRESS);
 }
 
 
@@ -28,8 +28,8 @@ bool Keyboard::isKeyReleased(const std::string &key)
     return (glfwGetKey(RGraph::getWindow(),it->second) == GLFW_RELEASE);
 }
 
-bool Keyboard::isKeyReleased(const int i)
+bool Keyboard::isKeyReleased(const int key_id)
 {
-    return (glfwGetKey(RGraph::getWindow(), i) == GLFW_RELEASE);
+    return (glfwGetKey(RGraph::getWindow(), key_id) == GLFW_RELEASE);
 }
 

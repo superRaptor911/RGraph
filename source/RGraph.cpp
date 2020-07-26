@@ -1,6 +1,9 @@
 #include <RG/RGraph.h>
 #include <RG/r_util.h>
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 using namespace rg;
 
 RGraph RGraph::_Rgraph_instance;
@@ -43,6 +46,9 @@ bool RGraph::init(std::string win_name, glm::ivec2 win_size)
         return false;
     }
 
+    instance._resolution = instance._win_size;
+    instance._ortho_proj = glm::ortho(0.0f, instance._resolution.x, instance._resolution.y, 0.0f, -1.0f, 1.0f);
+
     return true;
 }
 
@@ -76,6 +82,9 @@ void RGraph::clearScreen()
 
 void RGraph::updateScreen()
 {
+    for (auto &it : _Rgraph_instance._ready2draw_callbacks)
+        it();
+
     glfwSwapBuffers(_Rgraph_instance._window);
 }
 

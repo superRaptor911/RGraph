@@ -7,6 +7,7 @@
 #include <string>
 #include <RG/Color.h>
 #include <RG/Shader.h>
+#include <vector>
 
 namespace rg
 {
@@ -17,20 +18,26 @@ namespace rg
 		glm::ivec2 _win_size;
 		// Screen resolution
 		glm::vec2 _resolution;
-
+		// Window
 		GLFWwindow* _window;
-
+		// Name of window
 		std::string _win_name;
+		// counter
 		bool _is_initiated = false;
-
+		// instance of RGraph
 		static RGraph _Rgraph_instance;
-
+		// Clear color
 		Color _clear_color;
 
-		typedef void (*RgCloseFunc);
+		glm::mat4 _ortho_proj;
 
-		RgCloseFunc _close_callback_func = nullptr;
-
+		// Call backs
+		typedef void (*Void_function) ();
+		typedef void (*Void_function) ();
+		
+		std::vector<Void_function> _win_close_callbacks;
+		std::vector<Void_function> _ready2draw_callbacks;
+		
 	private:
 
 		RGraph() {}
@@ -54,6 +61,8 @@ namespace rg
 		static void setResolution(const glm::vec2 &res) { _Rgraph_instance._resolution = res;}
 		static glm::vec2 getResolution() {return _Rgraph_instance._resolution;}
 
+		static glm::mat4 getOrthoProgection() { return _Rgraph_instance._ortho_proj;}
+
 		static GLFWwindow* getWindow() {return _Rgraph_instance._window;}
 
 		static void clearScreen();
@@ -64,7 +73,9 @@ namespace rg
 
 		static void pollEvents() { glfwPollEvents();}
 
-		static void setCloseCallback(RgCloseFunc func);
+		static void addCallback_onWindowClose(Void_function func);
+
+		static void addCallback_onReadyToDraw(Void_function func) { _Rgraph_instance._ready2draw_callbacks.push_back(func);}
 
 		~RGraph();
 	};

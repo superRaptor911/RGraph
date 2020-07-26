@@ -9,9 +9,18 @@ namespace rg
 {
     class Sprite : public Ref_Base
     {
+        struct vertex
+        {
+            glm::vec2 pos;
+            glm::vec2 uv;
+        };
+
     private:
 
+        //     Properties
+        // Texture
         Texture _texture;
+        // Scale
         glm::vec2 _scale = glm::vec2(1.f, 1.f);
         // Position of sprite
         glm::vec2 _position = glm::vec2(0,0);
@@ -20,26 +29,24 @@ namespace rg
         // Rotation of sprite
         float _rotation = 0.f;
 
-        uint _VAO, _VBO, _EBO;
-
+        // GL Stuff
+        // Counter
+        inline static bool _is_initiated = false;
+        // opengl objects 
+        static uint _VAO, _VBO, _EBO;
+        // Default shader
+        static Shader _defaut_shader;
+        // custom shader (Unique for instance)
         Shader _custom_shader;
+        
 
-        inline static const float _vertex_data[] = {
-            // positions         // texture coords
-             1.f,   1.f,   1.0f, 1.0f, // top right
-             1.f,   0.f,   1.0f, 0.0f, // bottom right
-             0.f,   0.f,   0.0f, 0.0f, // bottom left
-             0.f,   1.f,   0.0f, 1.0f  // top left 
-        };
-
-        inline static const uint _indices[] = {
-            0, 1, 3, // first triangle
-            1, 2, 3  // second triangle
-        };
+        static std::vector<Sprite> _draw_queue;
 
     private:
 
         inline void _decrementRefCount();
+
+        static void _drawAllSprites();
 
     public:
 

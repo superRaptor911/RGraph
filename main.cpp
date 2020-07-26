@@ -16,41 +16,46 @@
 #include <RG/File.h>
 #include <RG/r_util.h>
 #include <RG/Keyboard.h>
+#include <vector>
 
 using namespace rg;
 
 int main()
 {
 	
-	RGraph::init();
-	Sprite sprite(Texture("../res/rinc.png"));	
+	RGraph::init("N", glm::ivec2(1280,720));
+	auto tex = Texture("../res/rinc.png");
+	std::vector<Sprite> sprites;
+	for (size_t i = 0; i < 1000; i++)
+	{
+		Sprite s(tex);
+		s.setPosition(glm::vec2(rand() % 1300, rand() % 800));
+		sprites.push_back(s);
+	}
+	
 	RGraph::setClearColor(Color::Blue);
+
+	float t = glfwGetTime();
+	int frames = 0;
+
 
 	while (RGraph::windowOpen())
 	{
-		RGraph::clearScreen();
-		sprite.draw();
-
-		if (Keyboard::isKeyPressed("w"))
-			sprite.move(glm::vec2(0,-1) * 5.f);
+		frames += 1;
+		if (glfwGetTime() - 2 > t )
+		{
+			t = glfwGetTime();
+			std::cout << "FPS "<<frames / 2<< "\n";
+			frames = 0;
+		}
 		
-		if (Keyboard::isKeyPressed("s"))
-			sprite.move(glm::vec2(0,1) * 5.f);
+		RGraph::clearScreen();
 
-		if (Keyboard::isKeyPressed("a"))
-			sprite.move(glm::vec2(-1,0) * 5.f);
-
-		if (Keyboard::isKeyPressed("d"))
-			sprite.move(glm::vec2(1,0) * 5.f);
-
-		if (Keyboard::isKeyPressed("x"))
-			sprite.rotate(0.02);
-
-		if (Keyboard::isKeyPressed("z"))
-			sprite.rotate(-0.02);
-
-		if (Keyboard::isKeyPressed("p"))
-			std::cout<< sprite.getOrigin().x << "," << sprite.getPosition().y << "\n";
+		for (auto &i : sprites)
+		{
+			i.rotate(-0.08);
+			i.draw();
+		}
 
 		RGraph::updateScreen();
 		RGraph::pollEvents();

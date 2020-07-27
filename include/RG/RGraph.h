@@ -33,7 +33,6 @@ namespace rg
 
 		// Call backs
 		typedef void (*Void_function) ();
-		typedef void (*Void_function) ();
 		
 		std::vector<Void_function> _win_close_callbacks;
 		std::vector<Void_function> _ready2draw_callbacks;

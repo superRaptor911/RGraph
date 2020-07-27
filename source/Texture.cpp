@@ -109,7 +109,7 @@ void Texture::_decrementRefCount()
         if (_texture != RG_INVALID_ID)
             glDeleteTextures(1, &_texture);
 
-        DEBUG_PRINT("Deleting Texture");
+        //DEBUG_PRINT("Deleting Texture");
     }
 }
 

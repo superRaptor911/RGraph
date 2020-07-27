@@ -78,12 +78,13 @@ void RGraph::setClearColor(const Color &c_color)
 void RGraph::clearScreen()
 {
     glClear(GL_COLOR_BUFFER_BIT);
+    for (auto &it : _Rgraph_instance._ready2draw_callbacks)
+        it();
 }
 
 void RGraph::updateScreen()
 {
-    for (auto &it : _Rgraph_instance._ready2draw_callbacks)
-        it();
+
 
     glfwSwapBuffers(_Rgraph_instance._window);
 }

@@ -4,6 +4,7 @@
 #include <RG/Texture.h>
 #include <RG/Shader.h>
 #include <RG/Ref_Base.h>
+#include <vector>
 
 namespace rg
 {
@@ -33,14 +34,14 @@ namespace rg
         // Counter
         inline static bool _is_initiated = false;
         // opengl objects 
-        static uint _VAO, _VBO, _EBO;
+        inline static uint _VAO, _VBO, _EBO;
         // Default shader
-        static Shader _defaut_shader;
+        inline static Shader _default_shader;
         // custom shader (Unique for instance)
-        Shader _custom_shader;
+        //Shader _custom_shader;
         
 
-        static std::vector<Sprite> _draw_queue;
+        inline static std::vector<Sprite> _draw_queue;
 
     private:
 

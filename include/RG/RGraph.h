@@ -36,6 +36,7 @@ namespace rg
 		
 		std::vector<Void_function> _win_close_callbacks;
 		std::vector<Void_function> _ready2draw_callbacks;
+		std::vector<Void_function> _RGInitiated_callbacks;
 		
 	private:
 
@@ -75,6 +76,8 @@ namespace rg
 		static void addCallback_onWindowClose(Void_function func);
 
 		static void addCallback_onReadyToDraw(Void_function func) { _Rgraph_instance._ready2draw_callbacks.push_back(func);}
+
+		static void addCallback_RGInitiated(Void_function func) { _Rgraph_instance._RGInitiated_callbacks.push_back(func);}
 
 		~RGraph();
 	};

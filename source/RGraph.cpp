@@ -49,6 +49,9 @@ bool RGraph::init(std::string win_name, glm::ivec2 win_size)
     instance._resolution = instance._win_size;
     instance._ortho_proj = glm::ortho(0.0f, instance._resolution.x, instance._resolution.y, 0.0f, -1.0f, 1.0f);
 
+    for (auto &it : _Rgraph_instance._RGInitiated_callbacks)
+        it();
+
     return true;
 }
 
@@ -78,14 +81,14 @@ void RGraph::setClearColor(const Color &c_color)
 void RGraph::clearScreen()
 {
     glClear(GL_COLOR_BUFFER_BIT);
+    
+    // Ready to Draw callbacks
     for (auto &it : _Rgraph_instance._ready2draw_callbacks)
         it();
 }
 
 void RGraph::updateScreen()
 {
-
-
     glfwSwapBuffers(_Rgraph_instance._window);
 }
 

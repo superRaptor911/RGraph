@@ -26,11 +26,13 @@ int main()
 	RGraph::init("N", glm::ivec2(1280,720));
 	auto tex = Texture("../res/rinc.png");
 	std::vector<Sprite> sprites;
-	for (size_t i = 0; i < 9998; i++)
+	for (size_t i = 0; i < 1000; i++)
 	{
 		Sprite s(tex);
 		s.setPosition(glm::vec2(rand() % 1300, rand() % 800));
+		//s.setScale(glm::vec2(2,2));
 		sprites.push_back(s);
+
 	}
 	
 	RGraph::setClearColor(Color::Blue);

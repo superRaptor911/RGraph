@@ -33,13 +33,27 @@ namespace rg
         // GL Stuff
         // Counter
         inline static bool _is_initiated = false;
-        // opengl objects 
-        inline static uint _VAO, _VBO, _EBO;
+        // opengl vertex array obj 
+        inline static uint _VAO;
+        // Buffers
+        inline static uint  _VBO, _EBO, _trans_buffer;
         // Default shader
         inline static Shader _default_shader;
         // custom shader (Unique for instance)
         //Shader _custom_shader;
-        
+
+        inline static const float _vertex_data[] = {
+            // positions         // texture coords
+             0.f,   1.f,   1.0f, 1.0f, // top right
+             1.f,   1.f,   0.0f, 1.0f, // bottom right
+             1.f,   0.f,   0.0f, 0.0f, // bottom left
+             0.f,   0.f,   1.0f, 0.0f  // top left 
+        };
+
+        inline static const uint _indices[] = {
+            0, 1, 2, // first triangle
+            2, 3, 0  // second triangle
+        };     
 
         inline static std::vector<Sprite> _draw_queue;
 

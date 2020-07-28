@@ -29,6 +29,8 @@ namespace rg
         // Load texture from file
         Texture(const std::string &path);
         
+        bool operator == (const Texture &T);
+
         // Load from a file
         bool loadTexture(const std::string &path);
         
@@ -40,7 +42,9 @@ namespace rg
 
         // set as current texture for draw call
         void activate(int id = 0);
-
+        
+        // Get opengl texture id
+        uint getTextureID() { return _texture;}
 
         ~Texture();
     };    

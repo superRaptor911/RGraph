@@ -46,6 +46,11 @@ Texture &Texture::operator = (const Texture &T)
     return *this;
 }
 
+bool Texture::operator == (const Texture &T)
+{
+    return (_texture == T._texture);
+}
+
 bool Texture::loadTexture(const std::string &path)
 {
     stbi_set_flip_vertically_on_load(true); 

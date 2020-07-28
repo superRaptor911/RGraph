@@ -23,7 +23,7 @@ using namespace rg;
 int main()
 {
 	
-	RGraph::init("N", glm::ivec2(1280,720));
+	RGraph::init("Haha", glm::ivec2(1280,720));
 	auto tex = Texture("../res/rinc.png");
 	std::vector<Sprite> sprites;
 	for (size_t i = 0; i < 1000; i++)

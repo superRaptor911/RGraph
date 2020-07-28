@@ -4,6 +4,7 @@
 #include <vector>
 #include <RG/Sprite.h>
 
+
 namespace rg
 {
     class SpriteBatcher
@@ -12,10 +13,12 @@ namespace rg
         
         std::vector<Sprite> _draw_queue;
 
+        std::vector<int> _batches;
+
         // opengl vertex array obj 
         uint _VAO;
         // Buffers
-        uint  _VBO, _EBO, _trans_buffer;
+        uint  _VBO, _EBO, _trans_buffer, _tex_id_buffer;
 
         const float _vertex_data[16] = {
             // positions         // texture coords
@@ -35,6 +38,7 @@ namespace rg
         static SpriteBatcher _SBinstance;
 
         const int _max_sprites_per_batch = 10000;
+        int _max_textures_per_batch = 16;
 
     private:
 

@@ -28,28 +28,28 @@ namespace rg
 		static RGraph _Rgraph_instance;
 		// Clear color
 		Color _clear_color;
-
+		// Projection Matrix
 		glm::mat4 _ortho_proj;
 
 		// Call backs
 		typedef void (*Void_function) ();
 		
+		// Callbacks
 		std::vector<Void_function> _win_close_callbacks;
 		std::vector<Void_function> _ready2draw_callbacks;
 		std::vector<Void_function> _RGInitiated_callbacks;
-		
+		std::vector<Void_function> _win_resized_callbacks;
+
 	private:
 
 		RGraph() {}
 
+		// Called when window is resized
 		static void _handleWindowResize(GLFWwindow* window, int width, int height);
 
+		// Called when close button is pressed
 		static void _handleCloseButtonPressed(GLFWwindow * window);
 
-
-	public:
-
-		
 	public:
 		
 		static bool init(std::string win_name = "NO NAME", glm::ivec2 win_size = glm::ivec2(640, 480));
@@ -73,11 +73,15 @@ namespace rg
 
 		static void pollEvents() { glfwPollEvents();}
 
+		static float getTime() { return glfwGetTime();}
+
 		static void addCallback_onWindowClose(Void_function func);
 
 		static void addCallback_onReadyToDraw(Void_function func) { _Rgraph_instance._ready2draw_callbacks.push_back(func);}
 
 		static void addCallback_RGInitiated(Void_function func) { _Rgraph_instance._RGInitiated_callbacks.push_back(func);}
+
+		static void addCallback_winResized(Void_function func) { _Rgraph_instance._win_resized_callbacks.push_back(func);}
 
 		~RGraph();
 	};

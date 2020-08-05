@@ -23,37 +23,26 @@ using namespace rg;
 int main()
 {
 	
-	RGraph::init("Haha", glm::ivec2(1280,720));
+	RGraph::init("RGraph", glm::ivec2(1280,720));
+
 	auto tex = Texture("../res/rinc.png");
 	auto tex2 = Texture("../res/rinc2.png");
 
 	std::vector<Sprite> sprites;
 	for (size_t i = 0; i < 8; i++)
 	{
-
 		Sprite s(tex);
-
 		s.setPosition(glm::vec2(rand() % 1280, rand() % 720));
-
 		sprites.push_back(s);
 	}
 	
 	RGraph::setClearColor(Color::Blue);
 
-	float t = glfwGetTime();
-	int frames = 0;
+
 
 
 	while (RGraph::windowOpen())
-	{
-		frames += 1;
-		if (glfwGetTime() - 2 > t )
-		{
-			t = glfwGetTime();
-			std::cout << "FPS "<<frames / 2 << " Time(us) : " << (1.f / frames ) * 2.f * 1000 << "\n";
-			frames = 0;
-		}
-		
+	{		
 		RGraph::clearScreen();
 
 		for (auto &i : sprites)

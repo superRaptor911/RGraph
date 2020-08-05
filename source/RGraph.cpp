@@ -94,6 +94,8 @@ void RGraph::clearScreen()
 void RGraph::updateScreen()
 {
     glfwSwapBuffers(_Rgraph_instance._window);
+    _Rgraph_instance._frame_times[0] = _Rgraph_instance._frame_times[1];
+    _Rgraph_instance._frame_times[1] = glfwGetTime();
 }
 
 bool RGraph::windowOpen() 

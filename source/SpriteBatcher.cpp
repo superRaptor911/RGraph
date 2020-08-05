@@ -147,11 +147,11 @@ void SpriteBatcher::_drawAllSprites()
     // Setup Texture batch (Group sprites by texture)
     for (auto &it : _SBinstance._draw_queue)
     {
-        auto tex_index_it = Texture_Map.find(it._texture.getTextureID());
+        auto tex_index_it = Texture_Map.find(it._attribute.texture.getTextureID());
         auto tex_batch_id = 0;
         if (tex_index_it == Texture_Map.end())
         {
-            tex_index_it = Texture_Map.insert(std::pair<uint,int>(it._texture.getTextureID(), Texture_Map.size())).first;
+            tex_index_it = Texture_Map.insert(std::pair<uint,int>(it._attribute.texture.getTextureID(), Texture_Map.size())).first;
             texture_batches.push_back(std::vector<Sprite *>());
             texture_batches[texture_batches.size() - 1].reserve(_SBinstance._max_sprites_per_batch / 2);
         }
@@ -248,31 +248,24 @@ void SpriteBatcher::_drawAllSprites()
         for (auto &spr : it.sprites)
         {
             glm::mat4 model = glm::mat4(1.0f);
-            // model = glm::translate(model, glm::vec3(spr._position , 0.0f));
-            model = glm::translate(model, glm::vec3(spr->_origin * spr->_scale + spr->_position, 0.0f)); 
-            model = glm::rotate(model, spr->_rotation, glm::vec3(0.0f, 0.0f, 1.0f)); 
-            model = glm::translate(model, glm::vec3(-spr->_origin * spr->_scale, 0.0f));
-            model = glm::scale(model, glm::vec3(glm::vec2(spr->_texture.getSize()) * spr->_scale, 1.0f));
+
+            model = glm::translate(model, glm::vec3(spr->_attribute.origin * spr->_attribute.scale + spr->_attribute.position, 0.0f)); 
+            model = glm::rotate(model, spr->_attribute.rotation, glm::vec3(0.0f, 0.0f, 1.0f)); 
+            model = glm::translate(model, glm::vec3(-spr->_attribute.origin * spr->_attribute.scale, 0.0f));
+            model = glm::scale(model, glm::vec3(glm::vec2(spr->_attribute.texture.getSize()) * spr->_attribute.scale, 1.0f));
 
             trans_buffer[index] = model;
             index += 1;
         }
-        
-/*         for (int i = 0; i < quad_count; i++)
-        {
-            printf("index = %f\n", *(it.tex_ids.data() + i));
-        }
-        
-
-        printf("ss %d\n", quad_count);
-
-        exit(0);   */
-        
+              
         glBindVertexArray(_SBinstance._VAO);
+        // Transform buffer
         glBindBuffer(GL_ARRAY_BUFFER, _SBinstance._trans_buffer);
         glBufferSubData(GL_ARRAY_BUFFER, 0, quad_count * sizeof(glm::mat4), trans_buffer);
+        // Texture Index buffer
         glBindBuffer(GL_ARRAY_BUFFER, _SBinstance._tex_id_buffer);
         glBufferSubData(GL_ARRAY_BUFFER, 0, quad_count * sizeof(float), it.tex_ids.data());
+        
         glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, quad_count);
     }
 

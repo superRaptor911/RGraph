@@ -31,6 +31,8 @@ namespace rg
 		// Projection Matrix
 		glm::mat4 _ortho_proj;
 
+		float _frame_times[2] = {0, 0};
+
 		// Call backs
 		typedef void (*Void_function) ();
 		
@@ -74,6 +76,8 @@ namespace rg
 		static void pollEvents() { glfwPollEvents();}
 
 		static float getTime() { return glfwGetTime();}
+
+		static float getFrameTime() { return (_Rgraph_instance._frame_times[1] - _Rgraph_instance._frame_times[0]);}
 
 		static void addCallback_onWindowClose(Void_function func);
 

@@ -1,5 +1,5 @@
-#ifndef SPRITE_H
-#define SPRITE_H
+#ifndef SPRITE_attribute.H
+#define SPRITE_attribute.H
 
 #include <RG/Texture.h>
 #include <RG/Shader.h>
@@ -12,28 +12,24 @@ namespace rg
 
     class Sprite : public Ref_Base
     {
-        struct vertex
+        struct SpriteAttributes
         {
-            glm::vec2 pos;
-            glm::vec2 uv;
+            Texture texture;
+            // Scale
+            glm::vec2 scale = glm::vec2(1.f, 1.f);
+            // Position of sprite
+            glm::vec2 position = glm::vec2(0,0);
+            // Origin of sprite
+            glm::vec2 origin  = glm::vec2(0,0);
+            // Rotation of sprite
+            float rotation = 0.f;
+            // 
+            bool is_visible = true;
         };
 
     private:
 
-        //     Properties
-        // Texture
-        Texture _texture;
-        // Scale
-        glm::vec2 _scale = glm::vec2(1.f, 1.f);
-        // Position of sprite
-        glm::vec2 _position = glm::vec2(0,0);
-        // Origin of sprite
-        glm::vec2 _origin  = glm::vec2(0,0);
-        // Rotation of sprite
-        float _rotation = 0.f;
-
-        // GL Stuff
-        // Counter
+        SpriteAttributes _attribute;
 
         friend SpriteBatcher;
         
@@ -51,29 +47,29 @@ namespace rg
 
         Sprite &operator = (const Sprite &S);
 
-        Texture getTexture() const {return _texture;}
+        Texture getTexture() const {return _attribute.texture;}
 
-        void setTexture(const Texture &T) {_texture = T; _origin = glm::vec2(T.getSize()) / 2.f;}
+        void setTexture(const Texture &T) {_attribute.texture = T; _attribute.origin = glm::vec2(T.getSize()) / 2.f;}
 
-        glm::vec2 getPosition() const {return _position;}
+        glm::vec2 getPosition() const {return _attribute.position;}
 
-        void setPosition(const glm::vec2 &pos) {_position = pos;}
+        void setPosition(const glm::vec2 &pos) {_attribute.position = pos;}
 
-        void move(const glm::vec2 &delta) { _position += delta;}
+        void move(const glm::vec2 &delta) { _attribute.position += delta;}
 
-        glm::vec2 getOrigin() const {return _origin;}
+        glm::vec2 getOrigin() const {return _attribute.origin;}
 
-        void setOrigin(const glm::vec2 &origin) {_origin = origin;}
+        void setOrigin(const glm::vec2 &origin) {_attribute.origin = origin;}
 
-        glm::vec2 getScale() { return _scale;}
+        glm::vec2 getScale() { return _attribute.scale;}
 
-        void setScale(const glm::vec2 &scale) { _scale = scale;}
+        void setScale(const glm::vec2 &scale) { _attribute.scale = scale;}
 
-        float getRotaion() { return _rotation;}
+        float getRotaion() { return _attribute.rotation;}
 
-        void setRotation(float rot) { _rotation = rot;}
+        void setRotation(float rot) { _attribute.rotation = rot;}
 
-        void rotate(float angle) { _rotation += angle;}
+        void rotate(float angle) { _attribute.rotation += angle;}
 
         void draw();
 

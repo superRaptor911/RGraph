@@ -22,8 +22,8 @@ Sprite::Sprite(const Texture &T)
     // Start ref counting
     startRefCounting();
     // Set Texture
-    _texture = T;
-    _origin = glm::vec2(T.getSize()) / 2.f;
+    _attribute.texture = T;
+    _attribute.origin = glm::vec2(T.getSize()) / 2.f;
 }
 
 Sprite::Sprite(const Sprite &S)
@@ -31,12 +31,7 @@ Sprite::Sprite(const Sprite &S)
     // Attach to S
     attachToRefCount(S);
     // Cpy Texture
-    _texture = S._texture;
-
-    _rotation = S._rotation;
-    _position = S._position;
-    _origin = S._origin;
-    _scale = S._scale;
+    _attribute = S._attribute;
 }
 
 Sprite &Sprite::operator = (const Sprite &S)
@@ -46,13 +41,7 @@ Sprite &Sprite::operator = (const Sprite &S)
     // Increment ref count of S
     attachToRefCount(S);
     // Cpy Texture
-    _texture = S._texture;
-
-    _rotation = S._rotation;
-    _position = S._position;
-    _origin = S._origin;
-    _scale = S._scale;
-
+    _attribute = S._attribute;
     return *this;
 }
 
@@ -68,7 +57,8 @@ void Sprite::_decrementRefCount()
 
 void Sprite::draw()
 { 
-    SpriteBatcher::addSprite(*this);
+    if (_attribute.is_visible) 
+        SpriteBatcher::addSprite(*this);
 }
 
 

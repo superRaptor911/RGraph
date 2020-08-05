@@ -25,14 +25,18 @@ int main()
 	
 	RGraph::init("Haha", glm::ivec2(1280,720));
 	auto tex = Texture("../res/rinc.png");
+	auto tex2 = Texture("../res/rinc2.png");
+
 	std::vector<Sprite> sprites;
-	for (size_t i = 0; i < 1000; i++)
+	for (size_t i = 0; i < 1; i++)
 	{
 		Sprite s(tex);
-		s.setPosition(glm::vec2(rand() % 1300, rand() % 800));
+		Sprite s2(tex2);
+		s2.setPosition(glm::vec2(rand() % 1280, rand() % 720));
+		s.setPosition(glm::vec2(rand() % 1280, rand() % 720));
 		//s.setScale(glm::vec2(2,2));
 		sprites.push_back(s);
-
+		sprites.push_back(s2);
 	}
 	
 	RGraph::setClearColor(Color::Blue);
@@ -47,7 +51,7 @@ int main()
 		if (glfwGetTime() - 2 > t )
 		{
 			t = glfwGetTime();
-			std::cout << "FPS "<<frames / 2<< "\n";
+			std::cout << "FPS "<<frames / 2 << " Time(us) : " << (1.f / frames ) * 2.f * 1000 << "\n";
 			frames = 0;
 		}
 		

@@ -52,7 +52,8 @@
 		"iterator": "cpp",
 		"numeric": "cpp",
 		"random": "cpp",
-		"iomanip": "cpp"
+		"iomanip": "cpp",
+		"thread": "cpp"
 	},
 	"C_Cpp.errorSquiggles": "Enabled"
 }

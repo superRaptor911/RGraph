@@ -114,8 +114,6 @@ int Shader::_getUniformLocation(const std::string &param)
     if (it != _param_loc_cache.end())
         return it->second;
 
-    DEBUG_PRINT("shader Cache miss");
-
     // Get location
     int uniform_loc = glGetUniformLocation(_shader_program, param.c_str());
     // Check validity of location

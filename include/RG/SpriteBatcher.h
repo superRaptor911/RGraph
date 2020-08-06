@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <RG/Sprite.h>
+#include <map>
 
 
 namespace rg
@@ -12,6 +13,8 @@ namespace rg
     private:
         
         std::vector<Sprite> _draw_queue;
+
+        std::map<uint, std::vector<Sprite>> _texture_map;
 
         std::vector<int> _batches;
 

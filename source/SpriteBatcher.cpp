@@ -136,6 +136,7 @@ void SpriteBatcher::_initBatcher()
 }
 
 
+
 void SpriteBatcher::_drawAllSprites()
 {
     if (_SBinstance._draw_queue.empty())

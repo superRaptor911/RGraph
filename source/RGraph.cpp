@@ -12,17 +12,20 @@ RGraph RGraph::_Rgraph_instance;
 
 bool RGraph::init(std::string win_name, glm::ivec2 win_size)
 {
+    // Instance of RGraph
     auto &instance = _Rgraph_instance;
 
     glfwInit();
     _Rgraph_instance._getGL_version();
 
+    // Use Opengl version 4.2
     if (_Rgraph_instance._gl_version >= 4.2f)
     {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
         printf("Open GL version : 4.2\n");
     }
+    // Use Opengl version 3.3
     else if (_Rgraph_instance._gl_version >= 3.3f)
     {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -41,11 +44,12 @@ bool RGraph::init(std::string win_name, glm::ivec2 win_size)
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     #endif
     
+    // Create window
     instance._win_size = win_size;
     instance._win_name = win_name;
     instance._window = glfwCreateWindow(win_size.x, win_size.y, win_name.c_str(), nullptr, nullptr);
 
-    // Check window 
+    // Check window creation
     if (instance._window == nullptr)
     {
         printf("Failed to create GLFW window\n");
@@ -58,13 +62,13 @@ bool RGraph::init(std::string win_name, glm::ivec2 win_size)
     glfwSetFramebufferSizeCallback(instance._window, _handleWindowResize);
     glfwSetWindowCloseCallback(instance._window, _handleCloseButtonPressed);
 
-    // Load all opengl function pointer
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        printf("Failed to initialize GLAD\n");
-        glfwTerminate();
-        return false;
-    }
+    // // Load all opengl function pointer
+    // if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    // {
+    //     printf("Failed to initialize GLAD\n");
+    //     glfwTerminate();
+    //     return false;
+    // }
 
     glEnable(GL_DEPTH_TEST);
 

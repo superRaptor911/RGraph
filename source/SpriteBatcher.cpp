@@ -218,58 +218,47 @@ void SpriteBatcher::_drawAllSprites()
     }
 
     glm::mat4 proj = RGraph::getOrthoProgection();
-    
     glm::mat4 *trans_buffer = new glm::mat4[ _SBinstance._max_sprites_per_batch];
-    int *texture_buffer = new int[ _SBinstance._max_sprites_per_batch];
     
+    // Bind vertex array
+    glBindVertexArray(_SBinstance._VAO);
 
+    // Activate/Setup shader
     _SBinstance._default_shader.activate();
     _SBinstance._default_shader.setParam("proj", proj);
-
     for (int i = 0; i < _SBinstance._max_textures_per_batch; i++)
-    {
         _SBinstance._default_shader.setParam("textures[" + std::to_string(i) + "]", i);
-    }
-    
 
+    // Draw batches
     for (auto &it : batches)
     {
         for (size_t i = 0; i < it.textures.size(); i++)
         {
             glActiveTexture(GL_TEXTURE0 + i);
             glBindTexture(GL_TEXTURE_2D, it.textures[i]);
-            //printf("shader %d\n", it.textures[i]);
         }
 
         int quad_count = it.sprites.size();
-        int index = 0;
-
+        
         // Heavy computation
-        for (auto &spr : it.sprites)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-
-            model = glm::translate(model, glm::vec3(spr->_attribute.origin * spr->_attribute.scale + spr->_attribute.position, 0.0f)); 
-            model = glm::rotate(model, spr->_attribute.rotation, glm::vec3(0.0f, 0.0f, 1.0f)); 
-            model = glm::translate(model, glm::vec3(-spr->_attribute.origin * spr->_attribute.scale, 0.0f));
-            model = glm::scale(model, glm::vec3(glm::vec2(spr->_attribute.texture.getSize()) * spr->_attribute.scale, 1.0f));
-
-            trans_buffer[index] = model;
-            index += 1;
-        }
+        for (int i = 0; i < quad_count; i++)
+            trans_buffer[i] = it.sprites[i]->getTransformMatrix();
               
-        glBindVertexArray(_SBinstance._VAO);
+        
         // Transform buffer
         glBindBuffer(GL_ARRAY_BUFFER, _SBinstance._trans_buffer);
         glBufferSubData(GL_ARRAY_BUFFER, 0, quad_count * sizeof(glm::mat4), trans_buffer);
+        
         // Texture Index buffer
         glBindBuffer(GL_ARRAY_BUFFER, _SBinstance._tex_id_buffer);
         glBufferSubData(GL_ARRAY_BUFFER, 0, quad_count * sizeof(float), it.tex_ids.data());
         
         glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, quad_count);
     }
+    
+    // Unbind vertex array
+    glBindVertexArray(0);
 
     _SBinstance._draw_queue.clear();
     delete[] trans_buffer;
-    delete[] texture_buffer;
 }

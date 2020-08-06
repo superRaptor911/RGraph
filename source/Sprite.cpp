@@ -13,36 +13,49 @@ using namespace rg;
 
 Sprite::Sprite()
 {
-    // Start ref counting
     startRefCounting();
 }
 
 Sprite::Sprite(const Texture &T)
 {
-    // Start ref counting
     startRefCounting();
-    // Set Texture
+
     _attribute.texture = T;
     _attribute.origin = glm::vec2(T.getSize()) / 2.f;
 }
 
 Sprite::Sprite(const Sprite &S)
 {
-    // Attach to S
     attachToRefCount(S);
-    // Cpy Texture
+
     _attribute = S._attribute;
 }
 
 Sprite &Sprite::operator = (const Sprite &S)
 { 
     _decrementRefCount();
-
-    // Increment ref count of S
     attachToRefCount(S);
-    // Cpy Texture
+
     _attribute = S._attribute;
     return *this;
+}
+
+glm::mat4 Sprite::getTransformMatrix()
+{
+    glm::mat4 model = glm::mat4(1.0f);
+
+    model = glm::translate(model, glm::vec3(_attribute.origin * _attribute.scale + _attribute.position, 0.0f)); 
+    model = glm::rotate(model, _attribute.rotation, glm::vec3(0.0f, 0.0f, 1.0f)); 
+    model = glm::translate(model, glm::vec3(-_attribute.origin * _attribute.scale, 0.0f));
+    model = glm::scale(model, glm::vec3(glm::vec2(_attribute.texture.getSize()) * _attribute.scale, 1.0f));
+
+    return model;
+}
+
+void Sprite::draw()
+{ 
+    if (_attribute.is_visible) 
+        SpriteBatcher::addSprite(*this);
 }
 
 
@@ -54,13 +67,6 @@ void Sprite::_decrementRefCount()
         DEBUG_PRINT("Deleting Sprite");
     }    
 }
-
-void Sprite::draw()
-{ 
-    if (_attribute.is_visible) 
-        SpriteBatcher::addSprite(*this);
-}
-
 
 Sprite::~Sprite()
 {

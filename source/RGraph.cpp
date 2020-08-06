@@ -9,15 +9,34 @@ using namespace rg;
 
 RGraph RGraph::_Rgraph_instance;
 
+
 bool RGraph::init(std::string win_name, glm::ivec2 win_size)
 {
     auto &instance = _Rgraph_instance;
 
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    _Rgraph_instance._getGL_version();
 
+    if (_Rgraph_instance._gl_version >= 4.2f)
+    {
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+        printf("Open GL version : 4.2\n");
+    }
+    else if (_Rgraph_instance._gl_version >= 3.3f)
+    {
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        printf("Open GL version : 3.3\n");
+    }
+    else
+    {
+        printf("Hardware is not supported. Open GL 3.3 level GPU required.\n");
+        return false;
+    }
+    
+    
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     #ifdef __APPLE__
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     #endif
@@ -36,7 +55,6 @@ bool RGraph::init(std::string win_name, glm::ivec2 win_size)
 
     // Set at current context
     glfwMakeContextCurrent(instance._window);
-    // Handle Window resize
     glfwSetFramebufferSizeCallback(instance._window, _handleWindowResize);
     glfwSetWindowCloseCallback(instance._window, _handleCloseButtonPressed);
 
@@ -44,6 +62,7 @@ bool RGraph::init(std::string win_name, glm::ivec2 win_size)
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         printf("Failed to initialize GLAD\n");
+        glfwTerminate();
         return false;
     }
 
@@ -57,6 +76,47 @@ bool RGraph::init(std::string win_name, glm::ivec2 win_size)
 
     return true;
 }
+
+
+void RGraph::_getGL_version()
+{
+    _gl_version = -1.f;
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    #ifdef __APPLE__
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    #endif
+    
+    // Create test window
+   GLFWwindow* window = glfwCreateWindow(640, 480, "Test", nullptr, nullptr);
+
+    // Check window 
+    if (window == nullptr)
+    {
+        printf("Failed to create GLFW window\n");
+        printf("Minimum Open GL version supported is 3.3\n");
+        glfwTerminate();
+        return;
+    }
+
+    // Set at current context
+    glfwMakeContextCurrent(window);
+
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        printf("Failed to initialize GLAD\n");
+        glfwTerminate();
+        return;
+    }
+    
+    auto strings = splitStr((char *)glGetString(GL_VERSION), " ");
+    glfwDestroyWindow(window);
+    // Set gl version
+    _gl_version = std::stof(strings[0]);
+}
+
 
 void RGraph::_handleWindowResize(GLFWwindow* window, int width, int height)
 {

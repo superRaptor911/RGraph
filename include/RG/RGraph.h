@@ -14,6 +14,7 @@ namespace rg
 	class RGraph
 	{
 	private:
+		float _gl_version = -1.f;
 		// Window size
 		glm::ivec2 _win_size;
 		// Screen resolution
@@ -52,6 +53,9 @@ namespace rg
 		// Called when close button is pressed
 		static void _handleCloseButtonPressed(GLFWwindow * window);
 
+		//
+		void _getGL_version();
+
 	public:
 		
 		static bool init(std::string win_name = "NO NAME", glm::ivec2 win_size = glm::ivec2(640, 480));
@@ -78,6 +82,8 @@ namespace rg
 		static float getTime() { return glfwGetTime();}
 
 		static float getFrameTime() { return (_Rgraph_instance._frame_times[1] - _Rgraph_instance._frame_times[0]);}
+
+		static float getGlVersion() { return _Rgraph_instance._gl_version;}
 
 		static void addCallback_onWindowClose(Void_function func);
 

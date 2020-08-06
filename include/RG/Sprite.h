@@ -1,5 +1,5 @@
-#ifndef SPRITE_attribute.H
-#define SPRITE_attribute.H
+#ifndef SPRITE_H
+#define SPRITE_H
 
 #include <RG/Texture.h>
 #include <RG/Shader.h>
@@ -23,7 +23,7 @@ namespace rg
             glm::vec2 origin  = glm::vec2(0,0);
             // Rotation of sprite
             float rotation = 0.f;
-            // 
+            // Visibility of sprite
             bool is_visible = true;
         };
 
@@ -70,6 +70,8 @@ namespace rg
         void setRotation(float rot) { _attribute.rotation = rot;}
 
         void rotate(float angle) { _attribute.rotation += angle;}
+
+        glm::mat4 getTransformMatrix();
 
         void draw();
 

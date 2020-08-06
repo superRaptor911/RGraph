@@ -53,7 +53,8 @@
 		"numeric": "cpp",
 		"random": "cpp",
 		"iomanip": "cpp",
-		"thread": "cpp"
+		"thread": "cpp",
+		"unordered_set": "cpp"
 	},
 	"C_Cpp.errorSquiggles": "Enabled"
 }

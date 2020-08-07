@@ -28,6 +28,8 @@ int main()
 	auto tex = Texture("../res/rinc.png");
 	auto tex2 = Texture("../res/rinc2.png");
 
+	tex2.getImage().saveToFile("haha.png");
+
 	std::vector<Sprite> sprites;
 	for (size_t i = 0; i < 2; i++)
 	{

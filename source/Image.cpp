@@ -76,6 +76,9 @@ bool Image::loadImage(const std::string &filepath)
 
 void Image::saveToFile(const std::string &filepath)
 {
+    if (!_data)
+        return;
+
     auto extension = getExtension(filepath);
 
     if (extension == "jpg")
@@ -85,9 +88,7 @@ void Image::saveToFile(const std::string &filepath)
         stbi_write_png(filepath.c_str(), _img_info.size.x, _img_info.size.y, _img_info.channels, _data, _img_info.size.x * _img_info.channels);
     
     else
-    {
         stbi_write_png((filepath + ".png").c_str(), _img_info.size.x, _img_info.size.y, _img_info.channels, _data, _img_info.size.x * _img_info.channels);
-    }
 }
 
 
@@ -103,4 +104,9 @@ void Image::_decrementRefCount()
             _data = nullptr;
         }        
     }
+}
+
+Image::~Image()
+{
+    _decrementRefCount();
 }

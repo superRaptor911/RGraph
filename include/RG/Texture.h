@@ -4,11 +4,12 @@
 #include <glm/glm.hpp>
 #include <string>
 #include <RG/Ref_Base.h>
+#include <RG/Image.h>
 
 namespace rg
 {
     class Texture : public Ref_Base
-    {
+    {     
     private:
         uint _texture = RG_INVALID_ID;
         glm::ivec2 _size;
@@ -45,6 +46,8 @@ namespace rg
         
         // Get opengl texture id
         uint getTextureID() { return _texture;}
+
+        Image getImage();
 
         ~Texture();
     };    

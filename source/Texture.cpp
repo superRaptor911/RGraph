@@ -118,6 +118,21 @@ void Texture::_decrementRefCount()
     }
 }
 
+Image Texture::getImage()
+{
+    if (_texture == RG_INVALID_ID)
+        return Image();
+    
+    uchar* data = new uchar[_size.x * _size.y * _channels];
+
+    if (_channels == 4)
+        glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    else
+        glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    
+    return Image(data, _size, _channels);      
+}
+
 Texture::~Texture()
 {
     _decrementRefCount();

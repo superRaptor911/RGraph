@@ -37,6 +37,7 @@ namespace rg
 	// Split string
 	inline std::vector<std::string> splitStr(const std::string &str, const std::string &delimiter);
 	inline std::string toUpper(std::string str);
+	inline std::string getExtension(const std::string &str);
 	// Misc
 	//
 	inline void sleep(unsigned int m_sec);
@@ -126,6 +127,17 @@ namespace rg
 	{
 		for (auto & c: str) c = toupper(c);
 		return str;
+	}
+
+
+	std::string getExtension(const std::string &str)
+	{
+		auto strings = splitStr(str, ".");
+		if (strings.size() == 1)
+			return "";
+		
+		return strings[ strings.size() -1 ];
+		
 	}
 
 

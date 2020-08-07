@@ -19,17 +19,19 @@ bool RGraph::init(std::string win_name, glm::ivec2 win_size)
     _Rgraph_instance._getGL_version();
 
     // Use Opengl version 4.2
-    if (_Rgraph_instance._gl_version >= 4.2f)
+    if (_Rgraph_instance._max_gl_version >= 4.2f)
     {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+        _Rgraph_instance._gl_version = 4.2f;
         printf("Open GL version : 4.2\n");
     }
     // Use Opengl version 3.3
-    else if (_Rgraph_instance._gl_version >= 3.3f)
+    else if (_Rgraph_instance._max_gl_version >= 3.3f)
     {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        _Rgraph_instance._gl_version = 3.3f;
         printf("Open GL version : 3.3\n");
     }
     else
@@ -118,7 +120,7 @@ void RGraph::_getGL_version()
     auto strings = splitStr((char *)glGetString(GL_VERSION), " ");
     glfwDestroyWindow(window);
     // Set gl version
-    _gl_version = std::stof(strings[0]);
+    _max_gl_version = std::stof(strings[0]);
 }
 
 

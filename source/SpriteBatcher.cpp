@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <RG/RGraph.h>
 #include <RG/r_util.h>
+#include <stdio.h>
 #include <map>
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -20,69 +21,36 @@ SpriteBatcher::SpriteBatcher()
 
 void SpriteBatcher::_initBatcher()
 {
-    const char *vertex_source = "#version 330 core\n"
-        "layout (location = 0) in vec2 vpos;\n"
-        "layout (location = 1) in vec2 texCoord;\n"
-        "layout (location = 3) in int texID;\n"
-        "layout (location = 4) in mat4 instanceMatrix;\n"
+    const char *vertex_source_gl420 = "#version 420 core\n"
+                                "layout (location = 0) in vec2 vpos;\n"
+                                "layout (location = 1) in vec2 texCoord;\n"
+                                "layout (location = 3) in float texID;\n"
+                                "layout (location = 4) in mat4 instanceMatrix;\n"
 
-        "out vec2 uv;\n"
-        "out int tex_id;\n"
-        "uniform mat4 proj;\n"
+                                "out vec2 uv;\n"
+                                "out float tex_id;\n"
+                                "uniform mat4 proj;\n"
 
-        "void main()\n"
-        "{\n"
-        " gl_Position = proj * instanceMatrix * vec4(vpos, 0.0, 1.0);\n"
-        " uv = texCoord;\n"
-        " tex_id = texID;\n"
-        "}\n";
+                                "void main()\n"
+                                "{\n"
+                                " gl_Position = proj * instanceMatrix * vec4(vpos, 0.0, 1.0);\n"
+                                " uv = texCoord;\n"
+                                " tex_id = texID;\n"
+                                "}\n";
     
-    const char *frag_source = "#version 330 core\n"
-        "out vec4 FragColor;\n"
+    const char *frag_source_gl420 = "#version 420 core\n"
+                                    "out vec4 FragColor;\n"
 
-        "in vec2 uv;\n"
-        "in int tex_id;\n"
+                                    "in vec2 uv;\n"
+                                    "in float tex_id;\n"
 
-        "uniform sampler2D texture[16];\n"
+                                    "uniform sampler2D textures[%d];\n"
 
-        "void main()\n"
-        "{\n"
-        "	FragColor = texture(texture[tex_id], uv);\n"
-        "}\n";
-
-    
-
-    _SBinstance._default_shader = Shader(
-        "#version 450 core\n"
-        "layout (location = 0) in vec2 vpos;\n"
-        "layout (location = 1) in vec2 texCoord;\n"
-        "layout (location = 3) in float texID;\n"
-        "layout (location = 4) in mat4 instanceMatrix;\n"
-
-        "out vec2 uv;\n"
-        "out float tex_id;\n"
-        "uniform mat4 proj;\n"
-
-        "void main()\n"
-        "{\n"
-        " gl_Position = proj * instanceMatrix * vec4(vpos, 0.0, 1.0);\n"
-        " uv = texCoord;\n"
-        " tex_id = texID;\n"
-        "}\n",
-
-        "#version 450 core\n"
-        "out vec4 FragColor;\n"
-
-        "in vec2 uv;\n"
-        "in float tex_id;\n"
-
-        "uniform sampler2D textures[32];\n"
-
-        "void main()\n"
-        "{\n"
-        "	FragColor = texture(textures[int(tex_id)], uv);\n"
-        "}\n"
-        );
+                                    "void main()\n"
+                                    "{\n"
+                                    "	FragColor = texture(textures[int(tex_id)], uv);\n"
+                                    "}\n";
+ 
 
     int size_of_vertex = sizeof(float) * (2 + 2); // 2 floats for pos and 2 for uv
 
@@ -133,6 +101,15 @@ void SpriteBatcher::_initBatcher()
     glVertexAttribDivisor(7, 1);
 
     RGraph::addCallback_onReadyToDraw(_drawAllSprites);
+
+    // Set default shader
+    if (RGraph::getGlVersion() >= 4.2f)
+    {
+        char *frag_source = new char[ strlen(frag_source_gl420) + 32];
+        sprintf(frag_source, frag_source_gl420, _SBinstance._max_textures_per_batch);
+        _SBinstance._default_shader = Shader(vertex_source_gl420, frag_source);
+        delete[] frag_source;
+    }
 }
 
 

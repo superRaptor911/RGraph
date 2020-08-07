@@ -29,7 +29,7 @@ int main()
 	auto tex2 = Texture("../res/rinc2.png");
 
 	std::vector<Sprite> sprites;
-	for (size_t i = 0; i < 20000; i++)
+	for (size_t i = 0; i < 2; i++)
 	{
 		Sprite s(tex);
 		s.setPosition(glm::vec2(rand() % 1280, rand() % 720));

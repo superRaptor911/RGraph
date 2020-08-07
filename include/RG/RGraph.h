@@ -14,6 +14,7 @@ namespace rg
 	class RGraph
 	{
 	private:
+		float _max_gl_version = -1.f;
 		float _gl_version = -1.f;
 		// Window size
 		glm::ivec2 _win_size;

@@ -1,242 +1,157 @@
 #include <RG/SpriteBatcher.h>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <RG/RGraph.h>
-#include <RG/r_util.h>
-#include <stdio.h>
+#include <RG/deps/glad/glad.h>
+#include <RG/deps/GLFW/glfw3.h>
+#include <RG/Window.h>
 #include <map>
-
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 using namespace rg;
 
-SpriteBatcher SpriteBatcher::_SBinstance;
-
-SpriteBatcher::SpriteBatcher()
+SpriteBatcher::SpriteBatcher(Window *window)
 {
-    RGraph::addCallback_RGInitiated(_initBatcher);
-}
+    m_window = window;
 
-
-void SpriteBatcher::_initBatcher()
-{
-    const char *vertex_source_gl420 = "#version 420 core\n"
+    const char *vertex_source420 = "#version 420 core\n"
                                 "layout (location = 0) in vec2 vpos;\n"
-                                "layout (location = 1) in vec2 texCoord;\n"
-                                "layout (location = 3) in float texID;\n"
-                                "layout (location = 4) in mat4 instanceMatrix;\n"
+                                "layout (location = 1) in vec4 instanceColor;\n"
+                                "layout (location = 2) in float texID;\n"
+                                "layout (location = 3) in mat4 instanceMatrix;\n"
 
-                                "out vec2 uv;\n"
+                                "out vec4 clr;\n"
                                 "out float tex_id;\n"
+
                                 "uniform mat4 proj;\n"
 
                                 "void main()\n"
                                 "{\n"
-                                " gl_Position = proj * instanceMatrix * vec4(vpos, 0.0, 1.0);\n"
-                                " uv = texCoord;\n"
-                                " tex_id = texID;\n"
+                                    " gl_Position = proj * instanceMatrix * vec4(vpos, 0.0, 1.0);\n"
+                                    "clr = instanceColor;\n"
+                                    "tex_id = texID;\n"
                                 "}\n";
     
-    const char *frag_source_gl420 = "#version 420 core\n"
-                                    "out vec4 FragColor;\n"
+    const char *frag_source420  = "#version 420 core\n"
+                                "out vec4 FragColor;\n"
 
-                                    "in vec2 uv;\n"
-                                    "in float tex_id;\n"
+                                "in vec4 clr;\n"
+                                "in float tex_id;\n"
+                                "uniform sampler2D textures[%d];\n"
 
-                                    "uniform sampler2D textures[%d];\n"
+                                "void main()\n"
+                                "{\n"
+                                "	FragColor = clr * texture(textures[int(tex_id)], uv);\n"
+                                "}\n";
+    
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &m_max_texture_per_batch);
+    m_shader.addVertexShaderSource(vertex_source420);
+    m_shader.addFragmentShaderSource(frag_source420);
+    m_shader.createShader();
 
-                                    "void main()\n"
-                                    "{\n"
-                                    "	FragColor = texture(textures[int(tex_id)], uv);\n"
-                                    "}\n";
- 
+    int size_of_vertex = sizeof(float) * (2); // 2 floats for pos
 
-    int size_of_vertex = sizeof(float) * (2 + 2); // 2 floats for pos and 2 for uv
+    glGenVertexArrays(1, &m_VAO);
+    glGenBuffers(1, &m_VBO);
+    glGenBuffers(1, &m_EBO);
+    glGenBuffers(1, &m_trans_buffer);
+    glGenBuffers(1, &m_color_buffer);
+    glGenBuffers(1, &m_texID_buffer);
 
-    glGenVertexArrays(1, &_SBinstance._VAO);
-    glGenBuffers(1, &_SBinstance._VBO);
-    glGenBuffers(1, &_SBinstance._EBO);
-    glGenBuffers(1, &_SBinstance._tex_id_buffer);
-    glGenBuffers(1, &_SBinstance._trans_buffer);  
-
-    glBindVertexArray(_SBinstance._VAO);
+    glBindVertexArray(m_VAO);
 
     // position attribute
-    glBindBuffer(GL_ARRAY_BUFFER, _SBinstance._VBO);
-    glBufferData(GL_ARRAY_BUFFER, 4 * size_of_vertex, _SBinstance._vertex_data, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+    glBufferData(GL_ARRAY_BUFFER, 4 * size_of_vertex, m_vertex_data, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, size_of_vertex, (void*)0);
     glEnableVertexAttribArray(0);
 
-    // texture coord attribute
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _SBinstance._EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(uint), _SBinstance._indices, GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, size_of_vertex, (void*)(sizeof(float) * 2));
-    glEnableVertexAttribArray(1);
+    // EBO
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(uint), m_indices, GL_STATIC_DRAW);
 
-    // Tex id buffer
-    // Get maximum textures supported per call
-    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &_SBinstance._max_textures_per_batch);
-    glBindBuffer(GL_ARRAY_BUFFER, _SBinstance._tex_id_buffer);
-    glBufferData(GL_ARRAY_BUFFER, _SBinstance._max_sprites_per_batch * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
-    glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(float), (void*)0);
-    glVertexAttribDivisor(3, 1);
+    // Color buffer
+    glBindBuffer(GL_ARRAY_BUFFER, m_color_buffer);
+    glBufferData(GL_ARRAY_BUFFER, m_Max_Units * sizeof(glm::vec4), nullptr, GL_DYNAMIC_DRAW);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, size_of_vertex, (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribDivisor(1, 1);
+
+    // Color buffer
+    glBindBuffer(GL_ARRAY_BUFFER, m_texID_buffer);
+    glBufferData(GL_ARRAY_BUFFER, m_Max_Units * sizeof(float), nullptr, GL_DYNAMIC_DRAW);
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(float), (void*)0);
+    glEnableVertexAttribArray(2);
+    glVertexAttribDivisor(2, 1);
 
     // Trans buffer
-    glBindBuffer(GL_ARRAY_BUFFER, _SBinstance._trans_buffer);
-    glBufferData(GL_ARRAY_BUFFER, _SBinstance._max_sprites_per_batch * sizeof(glm::mat4), nullptr, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, m_trans_buffer);
+    glBufferData(GL_ARRAY_BUFFER, m_Max_Units * sizeof(glm::mat4), nullptr, GL_DYNAMIC_DRAW);
     std::size_t vec4Size = sizeof(glm::vec4);
+    glEnableVertexAttribArray(3); 
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
     glEnableVertexAttribArray(4); 
-    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
+    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
     glEnableVertexAttribArray(5); 
-    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
+    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
     glEnableVertexAttribArray(6); 
-    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
-    glEnableVertexAttribArray(7); 
-    glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
+    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
+    glVertexAttribDivisor(3, 1);
     glVertexAttribDivisor(4, 1);
     glVertexAttribDivisor(5, 1);
     glVertexAttribDivisor(6, 1);
-    glVertexAttribDivisor(7, 1);
-
-    RGraph::addCallback_onReadyToDraw(_drawAllSprites);
-
-    // Set default shader
-    if (RGraph::getGlVersion() >= 4.2f)
-    {
-        char *frag_source = new char[ strlen(frag_source_gl420) + 32];
-        sprintf(frag_source, frag_source_gl420, _SBinstance._max_textures_per_batch);
-        _SBinstance._default_shader = Shader(vertex_source_gl420, frag_source);
-        delete[] frag_source;
-    }
 }
 
 
-
-void SpriteBatcher::_drawAllSprites()
+void SpriteBatcher::draw(std::vector<Sprite> &sprites)
 {
-    if (_SBinstance._draw_queue.empty())
-        return;    
-
-    std::map<uint, int> Texture_Map;
-    std::vector<std::vector<Sprite *>> texture_batches;
-
-    // Setup Texture batch (Group sprites by texture)
-    for (auto &it : _SBinstance._draw_queue)
-    {
-        auto tex_index_it = Texture_Map.find(it._attribute.texture.getTextureID());
-        auto tex_batch_id = 0;
-        if (tex_index_it == Texture_Map.end())
-        {
-            tex_index_it = Texture_Map.insert(std::pair<uint,int>(it._attribute.texture.getTextureID(), Texture_Map.size())).first;
-            texture_batches.push_back(std::vector<Sprite *>());
-            texture_batches[texture_batches.size() - 1].reserve(_SBinstance._max_sprites_per_batch / 2);
-        }
-
-        tex_batch_id = tex_index_it->second;
-        texture_batches[ tex_batch_id].push_back(&it);
-    }
+    int sprite_count = sprites.size();
 
     struct Batch
     {
-        std::vector<uint> textures;
-        std::vector<Sprite *> sprites;
-        std::vector<float> tex_ids;
+        Texture tex;
+        std::vector<Sprite *> spr_ptr_list;
 
-        Batch()
-        {
-            sprites.reserve(_SBinstance._max_sprites_per_batch / 2);
-            tex_ids.reserve(_SBinstance._max_sprites_per_batch / 2);
-        }
+        Batch *next_batch = nullptr;
     };
-    
 
-    std::vector<Batch> batches;
-    batches.push_back(Batch());
-    Batch *current_batch = &batches[0];
-    int spr_count = 0;
-    int tex_count = 0;
-    
-    for (size_t i = 0; i < texture_batches.size(); i++)
+    std::map<Texture, Batch> texture_map;
+
+    std::vector<glm::mat4> transforms(sprite_count);
+    std::vector<glm::vec4> colors(sprite_count);
+    std::vector<int> texIds(sprite_count);
+
+    // Group by texture
+    for (auto &i : sprites)
     {
-        // Push this texture to our current batch
-        current_batch->textures.push_back(texture_batches[i][0]->getTexture().getTextureID());
-        
-        for (auto &it : texture_batches[i])
+        auto tex_index_it = texture_map.find(i.getTexture());
+        if (tex_index_it == texture_map.end())
         {
-            // Push this sprite to our current batch
-            current_batch->sprites.push_back(it);
-            current_batch->tex_ids.push_back(tex_count);
-            
-            spr_count++;
-            
-            // Chk sprite limit
-            if (spr_count >= _SBinstance._max_sprites_per_batch)
+            Batch b;
+            b.tex = i.getTexture();
+            tex_index_it = texture_map.insert(std::pair<Texture, Batch>(i.getTexture(), b)).first;
+        }
+
+        Batch *ptr = &tex_index_it->second;
+        while (ptr)
+        {
+            if (ptr->spr_ptr_list.size() >= m_Max_Units)
             {
-                // Create new batch
-                batches.push_back(Batch());
-                current_batch = &batches[batches.size() - 1];
-                // Push this texture to our current batch
-                current_batch->textures.push_back(it->getTexture().getTextureID());
-                spr_count = 0;
-                tex_count = 0;
+                if (ptr->next_batch)
+                {
+                    ptr = ptr->next_batch;
+                }
+                else
+                {
+                    ptr->next_batch = new Batch;
+                    ptr->next_batch->tex = ptr->tex;
+                    ptr = ptr->next_batch;
+                }               
             }
-        }
-
-        tex_count++;
-
-        if (tex_count >= _SBinstance._max_textures_per_batch)
-        {
-            batches.push_back(Batch());
-            current_batch = &batches[batches.size() - 1];
-            spr_count = 0;
-            tex_count = 0;
-        }
+            else
+            {
+                ptr->spr_ptr_list.push_back(&i);
+                break;
+            }            
+        }        
     }
 
-    glm::mat4 proj = RGraph::getOrthoProgection();
-    glm::mat4 *trans_buffer = new glm::mat4[ _SBinstance._max_sprites_per_batch];
     
-    // Bind vertex array
-    glBindVertexArray(_SBinstance._VAO);
-
-    // Activate/Setup shader
-    _SBinstance._default_shader.activate();
-    _SBinstance._default_shader.setParam("proj", proj);
-    for (int i = 0; i < _SBinstance._max_textures_per_batch; i++)
-        _SBinstance._default_shader.setParam("textures[" + std::to_string(i) + "]", i);
-
-    // Draw batches
-    for (auto &it : batches)
-    {
-        for (size_t i = 0; i < it.textures.size(); i++)
-        {
-            glActiveTexture(GL_TEXTURE0 + i);
-            glBindTexture(GL_TEXTURE_2D, it.textures[i]);
-        }
-
-        int quad_count = it.sprites.size();
-        
-        // Heavy computation
-        for (int i = 0; i < quad_count; i++)
-            trans_buffer[i] = it.sprites[i]->getTransformMatrix();
-              
-        
-        // Transform buffer
-        glBindBuffer(GL_ARRAY_BUFFER, _SBinstance._trans_buffer);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, quad_count * sizeof(glm::mat4), trans_buffer);
-        
-        // Texture Index buffer
-        glBindBuffer(GL_ARRAY_BUFFER, _SBinstance._tex_id_buffer);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, quad_count * sizeof(float), it.tex_ids.data());
-        
-        glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, quad_count);
-    }
     
-    // Unbind vertex array
-    glBindVertexArray(0);
-
-    _SBinstance._draw_queue.clear();
-    delete[] trans_buffer;
 }

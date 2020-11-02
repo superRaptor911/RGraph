@@ -1,92 +1,72 @@
 #include <RG/RGraph.h>
 #include <RG/r_util.h>
-#include <RG/Global_Def.h>
-
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 using namespace rg;
 
-RGraph RGraph::_Rgraph_instance;
-
-
-bool RGraph::init(std::string win_name, glm::ivec2 win_size)
+RGraph::RGraph()
 {
-    // Instance of RGraph
-    auto &instance = _Rgraph_instance;
+    if (!m_instance_ptr)
+    {
+        m_instance_ptr = this;
+    }
+    else
+    {
+        R_CPRINT_WARN("Only 1 instance of RGraph should be used at a time");
+    }
+    
+}
 
-    glfwInit();
-    _Rgraph_instance._getGL_version();
+
+bool RGraph::InitRgraph()
+{
+    if (!glfwInit())
+    {
+        printf("Fatal Error : Failed to initiate GLFW.");
+        return false;
+    }
+
+    m_getGLVersion();
+
 
     // Use Opengl version 4.2
-    if (_Rgraph_instance._max_gl_version >= 4.2f)
+    if (m_max_GL_version >= 4.2f)
     {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-        _Rgraph_instance._gl_version = 4.2f;
-        printf("Open GL version : 4.2\n");
+        m_GL_version = 4.2f;
+        printf("Using Open GL version : 4.2\n");
     }
     // Use Opengl version 3.3
-    else if (_Rgraph_instance._max_gl_version >= 3.3f)
+    else if (m_max_GL_version >= 3.3f)
     {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-        _Rgraph_instance._gl_version = 3.3f;
-        printf("Open GL version : 3.3\n");
+        m_GL_version = 3.3f;
+        printf("Using Open GL version : 3.3\n");
     }
     else
     {
         printf("Hardware is not supported. Open GL 3.3 level GPU required.\n");
         return false;
     }
-    
-    
+
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     #ifdef __APPLE__
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     #endif
-    
-    // Create window
-    instance._win_size = win_size;
-    instance._win_name = win_name;
-    instance._window = glfwCreateWindow(win_size.x, win_size.y, win_name.c_str(), nullptr, nullptr);
 
-    // Check window creation
-    if (instance._window == nullptr)
-    {
-        printf("Failed to create GLFW window\n");
-        glfwTerminate();
-        return false;
-    }
-
-    // Set at current context
-    glfwMakeContextCurrent(instance._window);
-    glfwSetFramebufferSizeCallback(instance._window, _handleWindowResize);
-    glfwSetWindowCloseCallback(instance._window, _handleCloseButtonPressed);
-
-    // // Load all opengl function pointer
-    // if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    // {
-    //     printf("Failed to initialize GLAD\n");
-    //     glfwTerminate();
-    //     return false;
-    // }
-
+    glfwSetErrorCallback(m_error_callback);
     glEnable(GL_DEPTH_TEST);
 
-    instance._resolution = instance._win_size;
-    instance._ortho_proj = glm::ortho(0.0f, instance._resolution.x, instance._resolution.y, 0.0f, -1.0f, 1.0f);
-
-    for (auto &it : _Rgraph_instance._RGInitiated_callbacks)
-        it();
-
+    m_default_window.createWindow(glm::ivec2(1024, 768), "Rgraph");
+    m_current_window = &m_default_window;
+    RGraph_initiated_signal.emit();
+    m_is_initiated = true;
     return true;
 }
 
-
-void RGraph::_getGL_version()
+void RGraph::m_getGLVersion()
 {
-    _gl_version = -1.f;
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -117,60 +97,40 @@ void RGraph::_getGL_version()
         return;
     }
     
+    printf("%s\n", (char *)glGetString(GL_VERSION));
     auto strings = splitStr((char *)glGetString(GL_VERSION), " ");
     glfwDestroyWindow(window);
     // Set gl version
-    _max_gl_version = std::stof(strings[0]);
+    m_max_GL_version = std::stof(strings[0]);
 }
 
 
-void RGraph::_handleWindowResize(GLFWwindow* window, int width, int height)
+Window *RGraph::getDefaultWindow()
 {
-    glViewport(0, 0, width, height);
-    // Change size
-    _Rgraph_instance._win_size = glm::ivec2(width, height);
-
-    for (auto &it : _Rgraph_instance._win_resized_callbacks)
-        it();
+    return m_current_window;
 }
 
 
-void RGraph::_handleCloseButtonPressed(GLFWwindow * window)
+void RGraph::m_error_callback(int error, const char* description)
 {
-    exit(0);
+    printf("Error : %s.\n", description);
 }
 
 
-void RGraph::setClearColor(const Color &c_color)
-{ 
-    _Rgraph_instance._clear_color = c_color;
-    glClearColor(c_color.r, c_color.g, c_color.b, c_color.a);
-}
 
-
-void RGraph::clearScreen()
+void RGraph::TerminateRgraph()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if (m_is_initiated)
+    {
+        glfwTerminate();
+        m_default_window.destroyWindow();
+        m_is_initiated = false;
+    }
     
-    // Ready to Draw callbacks
-    for (auto &it : _Rgraph_instance._ready2draw_callbacks)
-        it();
 }
 
-void RGraph::updateScreen()
-{
-    glfwSwapBuffers(_Rgraph_instance._window);
-    _Rgraph_instance._frame_times[0] = _Rgraph_instance._frame_times[1];
-    _Rgraph_instance._frame_times[1] = glfwGetTime();
-}
-
-bool RGraph::windowOpen() 
-{
-    return !glfwWindowShouldClose(_Rgraph_instance._window);
-}
 
 RGraph::~RGraph()
 {
-    DEBUG_PRINT("RGraph shutdown");
-    //glfwTerminate();
+    TerminateRgraph();
 }

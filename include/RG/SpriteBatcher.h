@@ -1,29 +1,26 @@
 #ifndef SPRITEBATCHER_H
 #define SPRITEBATCHER_H
 
-#include <vector>
+#include <RG/Shader.h>
 #include <RG/Sprite.h>
-#include <map>
 
 
 namespace rg
 {
+    class Window;
     class SpriteBatcher
     {
-    private:
-        
-        std::vector<Sprite> _draw_queue;
+        uint m_VAO;
+        uint  m_VBO, m_EBO, m_trans_buffer, m_color_buffer, m_texID_buffer;
 
-        std::map<uint, std::vector<Sprite>> _texture_map;
+        Shader m_shader;
+        Window *m_window;
 
-        std::vector<int> _batches;
+        const int m_Max_Units = 10000;
+        int m_max_texture_per_batch = 1;
 
-        // opengl vertex array obj 
-        uint _VAO;
-        // Buffers
-        uint  _VBO, _EBO, _trans_buffer, _tex_id_buffer;
 
-        const float _vertex_data[16] = {
+        const float m_vertex_data[16] = {
             // positions         // texture coords
              0.f,   1.f,   1.0f, 1.0f, // top right
              1.f,   1.f,   0.0f, 1.0f, // bottom right
@@ -31,32 +28,21 @@ namespace rg
              0.f,   0.f,   1.0f, 0.0f  // top left 
         };
 
-        const uint _indices[6] = {
+        const uint m_indices[6] = {
             0, 1, 2, // first triangle
             2, 3, 0  // second triangle
         };
 
-        Shader _default_shader;
-
-        static SpriteBatcher _SBinstance;
-
-        const int _max_sprites_per_batch = 10000;
-        int _max_textures_per_batch = 16;
-
     private:
-
-        SpriteBatcher();
-
-        static void _drawAllSprites();
-
-        static void _initBatcher();
-
+    
     public:
 
-        static void addSprite(const Sprite &spr) { _SBinstance._draw_queue.push_back(spr);}
+        SpriteBatcher(Window *window);
 
-        ~SpriteBatcher() {}
-    };    
+        void draw(std::vector<Sprite> &sprites);
+
+    };
+    
 }
 
 #endif

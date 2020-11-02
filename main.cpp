@@ -1,76 +1,39 @@
-/**
- * @file main.cpp
- * @author Raptor (Aditya Aravind) (you@domain.com)
- * @brief 
- * @version 0.1
- * @date 2020-06-10
- * 
- * @copyright Copyright (c) 2020
- * 
- */
-
-
-#include <iostream>
 #include <RG/RGraph.h>
-#include <RG/Sprite.h>
-#include <RG/File.h>
 #include <RG/r_util.h>
-#include <RG/Keyboard.h>
-#include <vector>
-
-using namespace rg;
+#include <RG/Drawer.h>
+#include <RG/File.h>
 
 int main()
 {
-	
-	RGraph::init("RGraph", glm::ivec2(1280,720));
+    rg::RGraph RG;
+    RG.InitRgraph();
+    
+    rg::Quad quad[10000];
+ 
+    rg::Window *w = RG.getDefaultWindow();
+    w->setClearColor(rg::Color::Blue);
+    rg::Drawer drawer(w);
 
-	auto tex = Texture("../res/rinc.png");
-	auto tex2 = Texture("../res/rinc2.png");
+    for (int i = 0; i < 9999; i++)
+    {
+        quad[i].setSize(glm::vec2(50,50));
+        quad[i].setPosition(glm::vec2(rand() % 1024, rand() % 768));
+        quad[i].setColor(rg::Color::Green);
+        quad[i].rotate(3.14 * (rand() % 100) / 100);
+        drawer.addToBatch(quad[i]);
+    }   
 
-	tex2.getImage().saveToFile("haha.png");
+    while (w->windowOpen())
+    {
+        w->clearScreen();
+        // for (int i = 0; i < 9999; i++)
+        // {
+        //     drawer.draw(quad[i]);
+        // }
+        
+        drawer.drawBatch();
+        w->updateScreen();
+    }
 
-	std::vector<Sprite> sprites;
-	for (size_t i = 0; i < 2; i++)
-	{
-		Sprite s(tex);
-		s.setPosition(glm::vec2(rand() % 1280, rand() % 720));
-		sprites.push_back(s);
-	}
-	
-	RGraph::setClearColor(Color::Blue);
-
-
-	float old_time = RGraph::getTime();
-	int frames = 0;
-	float frame_time = 0.f;
-
-	while (RGraph::windowOpen())
-	{		
-		RGraph::clearScreen();
-
-		for (auto &i : sprites)
-		{
-			i.rotate(-0.08);
-			i.draw();
-		}
-
-		RGraph::updateScreen();
-		RGraph::pollEvents();
-
-		float new_time = RGraph::getTime();
-		frame_time += RGraph::getFrameTime();
-		frames += 1;
-
-		if (new_time - old_time > 2)
-		{
-			old_time = new_time;
-			printf("FPS %d Frame time (us) : %f\n ",  frames / 2, (frame_time / frames) * 1000.f);
-			frames = 0;
-			frame_time = 0.f;
-		}
-		
-	}
-	
-	return 0;
+    return 0;
 }

@@ -19,7 +19,7 @@ namespace rg
     class Ref_Base
     {
     private:
-        int *_ref_count = nullptr;
+        int *m_ref_count = nullptr;
     protected:
 
         /**
@@ -28,11 +28,11 @@ namespace rg
          */
         void startRefCounting()
         {
-            if (_ref_count != nullptr)
+            if (m_ref_count != nullptr)
                 printf("Error : _ref_count not null!. Memory leak detected\n");
             
-            _ref_count = new int;
-            PTR_VAL(_ref_count) = 1;
+            m_ref_count = new int;
+            PTR_VAL(m_ref_count) = 1;
         }
 
         /**
@@ -43,22 +43,23 @@ namespace rg
          */
         bool dettachRefCount()
         {
-            if (_ref_count == nullptr)
+            if (m_ref_count == nullptr)
             {
-                printf("Error::REF_BASE: dettaching to null ref!. Op failed Memory will leak\n");
+                printf("Error::REF_BASE: dettaching from null ref!. Op failed Memory will leak\n");
                 return false;
             }
             
-            PTR_VAL(_ref_count) -= 1;
+            PTR_VAL(m_ref_count) -= 1;
 
-            if (PTR_VAL(_ref_count) == 0)
+            // Delete ptr
+            if (PTR_VAL(m_ref_count) == 0)
             {
-                delete _ref_count;
-                _ref_count = nullptr;
+                delete m_ref_count;
+                m_ref_count = nullptr;
                 return true;
             }
 
-            _ref_count = nullptr;
+            m_ref_count = nullptr;
             return false;
         }
 
@@ -68,21 +69,21 @@ namespace rg
          * 
          * @param ref ptr
          */
-        void attachToRefCount(const Ref_Base &ref)
+        void attachRefCount(const Ref_Base &ref)
         {
-            if (_ref_count != nullptr)
+            if (m_ref_count != nullptr)
                 printf("Error::REF_BASE: _ref_count not null!. Memory leak detected while attaching\n");
 
-            if (ref._ref_count == nullptr)
+            if (ref.m_ref_count == nullptr)
             {
                 printf("Error::REF_BASE: attaching to null ref!. Op failed Memory will leak\n");
                 return;
             }
 
             // Attach to ref
-            _ref_count = ref._ref_count;
+            m_ref_count = ref.m_ref_count;
             // increment count by 1
-            PTR_VAL(_ref_count) += 1;
+            PTR_VAL(m_ref_count) += 1;
         }
 
     };

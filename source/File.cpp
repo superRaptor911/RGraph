@@ -14,79 +14,85 @@
 
 using namespace rg;
 
-bool File::open(const std::string &file_path, Fmode rwmode, bool binary, bool truncate)
+bool File::open(const std::string &file_path, char open_mode, bool binary, bool truncate)
 {
-	if (_is_open)
+	if (m_is_open)
 	{
-		_file.close();
+		m_file.close();
 		R_CPRINT("Closing previous file and opening new");
 	}
 
-	std::string _file_path;
-	
-	#ifdef ENABLE_DIRMAN
-		static DirMan dirman;
-		_file_path = dirman.getActualPath(file_path);
-	#else
-		_file_path = file_path;
-	#endif
+	m_is_binary = binary;
+	m_open_mode = open_mode;
+	std::ios_base::openmode file_flags;
 
-	auto file_flags = rwmode;
+
+	
+	if (m_open_mode == 'a')
+		file_flags = std::fstream::app;
+	else if (m_open_mode == 'b')
+		file_flags = std::fstream::in | std::fstream::out;
+	else if (m_open_mode == 'r')
+		file_flags = std::fstream::in;
+	else if (m_open_mode == 'w')
+		file_flags = std::fstream::out;
+	else
+	{
+		R_CPRINT("Error : wrong file open flag provided");
+		return false;
+	}
 
 	// Binary Mode flag
-	if (_is_binary)
-		file_flags = file_flags | BINARY;
+	if (m_is_binary)
+		file_flags = file_flags | std::fstream::binary;
 	// Truncate flag
 	if (truncate)
 		file_flags = file_flags | std::fstream::trunc;
-	else
-		file_flags = file_flags | std::fstream::app;
 
 	// Open file with rwmode with file flags
-	_file.open(_file_path, file_flags);
+	m_file.open(file_path, file_flags);
 
 	// Set variables
-	_is_open = _file.good();
-	_is_binary = binary;
+	m_is_open = m_file.good();
 	
-	if (!_is_open)
-		R_CPRINT_ERR(("Unable to open file " + _file_path).c_str());
+	if (!m_is_open)
+		R_CPRINT_ERR(("Unable to open file " + file_path).c_str());
 	
-	return _is_open;
+	return m_is_open;
 }
 
 
 void File::close()
 {
-	if (_is_open)
-		_file.close();
+	if (m_is_open)
+		m_file.close();
 	else
 		R_CPRINT_WARN("File already closed");
 	
 }
 
 
-bool File::append(const std::string &data, bool newline)
+bool File::appendText(const std::string &data, bool newline)
 {
-	if (!_is_open || _is_binary)
+	if (!m_is_open || m_is_binary)
 		return false;
 	
 	if (newline)
-		_file << data << "\n";
+		m_file << data << "\n";
 	else
-		_file << data;
+		m_file << data;
 	
-	return !_file.bad();
+	return !m_file.bad();
 }
 
 bool File::appendBinary(const void *data, int size)
 {
-	if (!_is_open || !_is_binary)
+	if (!m_is_open || !m_is_binary)
 		return false;
 	
-	_file.write((char *)data, size);
+	m_file.write((char *)data, size);
 
-	return !_file.bad();
+	return !m_file.bad();
 }
 
 /**
@@ -96,27 +102,28 @@ bool File::appendBinary(const void *data, int size)
  */
 long int File::size()
 {
-	if (!_is_open)
+	if (!m_is_open)
 		return -1;
 	
-	int old_pos = _file.tellg();
-	_file.seekg(std::fstream::end);
+	int old_pos = m_file.tellg();
+	m_file.seekg(std::fstream::end);
 	
-	int sz = _file.tellg();
-	_file.seekg(old_pos, std::fstream::beg);
+	int sz = m_file.tellg();
+	m_file.seekg(old_pos, std::fstream::beg);
 	return sz;
 }
 
 
 std::string File::getFileContent()
 {
-	if (!_is_open || _rwMode == READ)
+	// Check file open or not
+	if (!m_is_open || !(m_open_mode == 'r' || m_open_mode == 'b'))
 		return "";
 	
 	std::stringstream buffer;
 	
-	_file.seekg(std::fstream::beg);
-	buffer << _file.rdbuf();
+	m_file.seekg(std::fstream::beg);
+	buffer << m_file.rdbuf();
 	
 	return buffer.str();	
 }
@@ -124,13 +131,13 @@ std::string File::getFileContent()
 std::string File::getLine()
 {
 	std::string rtn_val;
-	std::getline(_file,rtn_val);
+	std::getline(m_file, rtn_val);
 	return rtn_val;
 }
 
 File::~File()
 {
-	if (_is_open)
-		_file.close();
+	if (m_is_open)
+		m_file.close();
 }
 

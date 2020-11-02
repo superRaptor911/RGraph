@@ -18,22 +18,13 @@ namespace rg
 {
 	class File
 	{
-		typedef std::ios_base::openmode Fmode;
-
-		static const Fmode BINARY = std::fstream::binary;
-
-	public:
-
-		static const Fmode READ = std::fstream::in;
-		static const Fmode WRITE = std::fstream::out;
-		static const Fmode READ_WRITE = (std::fstream::in | std::fstream::out);
 		
 	private:
 	
-		std::fstream _file;
-		bool _is_open = false;
-		Fmode _rwMode;
-		bool _is_binary;
+		std::fstream m_file;
+		bool m_is_open = false;
+		bool m_is_binary = false;
+		char m_open_mode = 'r';
 
 	public:
 	
@@ -48,7 +39,7 @@ namespace rg
 		 * @return true if successful.
 		 * @return false 
 		 */
-		bool open(const std::string &file_path, Fmode rwmode = WRITE, 
+		bool open(const std::string &file_path, char open_mode = 'r',
 					bool binary = false, bool truncate = false);
 		
 		/**
@@ -63,14 +54,14 @@ namespace rg
 		 * @return true if opened.
 		 * @return false 
 		 */
-		bool isOpen() { return _is_open;}
+		bool isOpen() { return m_is_open;}
 
 		/**
 		 * @brief Get Read/write mode
 		 * 
 		 * @return RWMode 
 		 */
-		Fmode getRWMode() { return _rwMode;}
+		char getOpenMode() { return m_open_mode;}
 
 
 		/**
@@ -80,7 +71,7 @@ namespace rg
 		 * @return true if successful.
 		 * @return false 
 		 */
-		bool append(const std::string &data, bool newline = true);
+		bool appendText(const std::string &data, bool newline = true);
 		
 		/**
 		 * @brief Add binary data at the end. Only available in Binary mode.
@@ -103,12 +94,12 @@ namespace rg
 		template<typename T>
 		bool appendBinary(T &t)
 		{
-			if (!_is_open || !_is_binary)
+			if (!m_is_open || !m_is_binary)
 				return false;
 
-			_file.write((char *)&t, sizeof(t));
+			m_file.write((char *)&t, sizeof(t));
 
-			return !_file.bad();
+			return !m_file.bad();
 		}
 
 		/**
@@ -117,8 +108,6 @@ namespace rg
 		 * @return long int 
 		 */
 		long int size();
-
-		bool putAt();
 
 		/**
 		 * @brief Get the File Content
@@ -140,12 +129,12 @@ namespace rg
 		template<typename T>
 		bool readBinary(T &t)
 		{
-			if (!_is_open || !_is_binary)
+			if (!m_is_open || !m_is_binary)
 				return false;
 
-			_file.read((char *)&t, sizeof(t));
+			m_file.read((char *)&t, sizeof(t));
 
-			return !_file.bad();
+			return !m_file.bad();
 		}
 
 
@@ -162,7 +151,7 @@ namespace rg
 		 * @return true 
 		 * @return false 
 		 */
-		bool eof() { return _file.eof();}
+		bool eof() { return m_file.eof();}
 
 		~File();
 	};

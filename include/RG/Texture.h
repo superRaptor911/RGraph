@@ -11,13 +11,13 @@ namespace rg
     class Texture : public Ref_Base
     {     
     private:
-        uint _texture = RG_INVALID_ID;
-        glm::ivec2 _size;
-        int _channels;
+        uint m_texture_id = RG_INVALID_ID;
+        glm::ivec2 m_size;
+        int m_channels;
 
     private:
 
-        inline void _decrementRefCount();
+        inline void m_decrementRefCount();
 
     public:
         
@@ -45,7 +45,7 @@ namespace rg
         void activate(int id = 0);
         
         // Get opengl texture id
-        uint getTextureID() { return _texture;}
+        uint getTextureID() { return m_texture_id;}
 
         Image getImage();
 

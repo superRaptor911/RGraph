@@ -1,7 +1,7 @@
 #include <RG/Shader.h>
 #include <RG/r_util.h>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <RG/deps/glad/glad.h>
+#include <RG/deps/GLFW/glfw3.h>
 
 using namespace rg;
 
@@ -12,15 +12,16 @@ Shader::Shader()
 
 Shader::Shader(const Shader &shader)
 {
-    attachToRefCount(shader);
+    attachRefCount(shader);
 
-    _vertex_shader = shader._vertex_shader;
-    _fragment_shader = shader._fragment_shader;
-    _shader_program = shader._shader_program;
-    _param_loc_cache = shader._param_loc_cache;
+    m_vertex_shader = shader.m_vertex_shader;
+    m_fragment_shader = shader.m_fragment_shader;
+    m_shader_program = shader.m_shader_program;
+    m_param_loc_cache = shader.m_param_loc_cache;
+    
 }
 
-Shader::Shader(const char *vert_src, const char *frag_src)
+Shader::Shader(const std::string &vert_src, const std::string &frag_src)
 {
     startRefCounting();
 
@@ -30,18 +31,18 @@ Shader::Shader(const char *vert_src, const char *frag_src)
 
 Shader &Shader::operator = (const Shader &shader)
 {
-    _decrementRefCount();
-    attachToRefCount(shader);
+    m_decrementRefCount();
+    attachRefCount(shader);
 
-    _vertex_shader = shader._vertex_shader;
-    _fragment_shader = shader._fragment_shader;
-    _shader_program = shader._shader_program;
-    _param_loc_cache = shader._param_loc_cache;
+    m_vertex_shader = shader.m_vertex_shader;
+    m_fragment_shader = shader.m_fragment_shader;
+    m_shader_program = shader.m_shader_program;
+    m_param_loc_cache = shader.m_param_loc_cache;
 
     return *this; 
 }
 
-bool Shader::_chkError(uint &id, const std::string &type)
+bool Shader::m_chkError(uint &id, const std::string &type)
 {
     GLint success;
     GLchar infoLog[1024];
@@ -58,64 +59,65 @@ bool Shader::_chkError(uint &id, const std::string &type)
             glDeleteShader(id);
         
         id = RG_INVALID_ID;
-    }
+    } 
 
     return success;
 }
 
-bool Shader::addVertexShaderSource(const char *src)
+bool Shader::addVertexShaderSource(const std::string &source)
 {
     // Delete shader if already exists
-    if (_vertex_shader != RG_INVALID_ID)
-        glDeleteShader(_vertex_shader);
+    if (m_vertex_shader != RG_INVALID_ID)
+        glDeleteShader(m_vertex_shader);
     
+    const char* src = source.c_str();
     // create new shader
-    _vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(_vertex_shader, 1, &src, nullptr);
-    glCompileShader(_vertex_shader);
-
-    return _chkError(_vertex_shader, "Vertex");
+    m_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(m_vertex_shader, 1, &src, nullptr);
+    glCompileShader(m_vertex_shader);
+    return m_chkError(m_vertex_shader, "Vertex");
 }
 
-bool Shader::addFragmentShaderSource(const char *src)
+bool Shader::addFragmentShaderSource(const std::string &source)
  {
     // Delete shader if already exists
-    if (_fragment_shader != RG_INVALID_ID)
-        glDeleteShader(_fragment_shader);
+    if (m_fragment_shader != RG_INVALID_ID)
+        glDeleteShader(m_fragment_shader);
 
-    _fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(_fragment_shader, 1, &src, nullptr);
-    glCompileShader(_fragment_shader);
+    const char* src = source.c_str();
+    m_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(m_fragment_shader, 1, &src, nullptr);
+    glCompileShader(m_fragment_shader);
 
-    return _chkError(_fragment_shader, "Fragment");
+    return m_chkError(m_fragment_shader, "Fragment");
  }
 
 bool Shader::createShader()
 {
     // Delete program if already exists
-    if (_shader_program != RG_INVALID_ID)
-        glDeleteProgram(_shader_program);
+    if (m_shader_program != RG_INVALID_ID)
+        glDeleteProgram(m_shader_program);
 
-    _shader_program = glCreateProgram();
+    m_shader_program = glCreateProgram();
 
-    glAttachShader(_shader_program, _vertex_shader);
-    glAttachShader(_shader_program, _fragment_shader);
-    glLinkProgram(_shader_program);
+    glAttachShader(m_shader_program, m_vertex_shader);
+    glAttachShader(m_shader_program, m_fragment_shader);
+    glLinkProgram(m_shader_program);
 
-    return _chkError(_shader_program, "Linking");
+    return m_chkError(m_shader_program, "Linking");
 }
 
-int Shader::_getUniformLocation(const std::string &param)
+int Shader::m_getUniformLocation(const std::string &param)
 {
     // Set as current shader
-    glUseProgram(_shader_program);
+    glUseProgram(m_shader_program);
     // Search cache first
-    auto it = _param_loc_cache.find(param);
-    if (it != _param_loc_cache.end())
+    auto it = m_param_loc_cache.find(param);
+    if (it != m_param_loc_cache.end())
         return it->second;
 
     // Get location
-    int uniform_loc = glGetUniformLocation(_shader_program, param.c_str());
+    int uniform_loc = glGetUniformLocation(m_shader_program, param.c_str());
     // Check validity of location
     if (uniform_loc == -1)
     {
@@ -124,14 +126,14 @@ int Shader::_getUniformLocation(const std::string &param)
     }
 
     // Add to cache
-    _param_loc_cache.insert(std::pair<std::string, int>(param, uniform_loc));
+    m_param_loc_cache.insert(std::pair<std::string, int>(param, uniform_loc));
 
     return uniform_loc;
 }
 
 void Shader::setParam(const std::string &param, int val)
 {
-    int loc = _getUniformLocation(param);
+    int loc = m_getUniformLocation(param);
 
     if (loc != -1)
         glUniform1i(loc, val);
@@ -140,7 +142,7 @@ void Shader::setParam(const std::string &param, int val)
 
 void Shader::setParam(const std::string &param, float val)
 {
-    int loc = _getUniformLocation(param);
+    int loc = m_getUniformLocation(param);
 
     if (loc != -1)
         glUniform1f(loc, val);
@@ -148,7 +150,7 @@ void Shader::setParam(const std::string &param, float val)
 
 void Shader::setParam(const std::string &param, const glm::vec2 &val)
 {
-    int loc = _getUniformLocation(param);
+    int loc = m_getUniformLocation(param);
 
     if (loc != -1)
         glUniform2f(loc, val.x, val.y);
@@ -156,7 +158,7 @@ void Shader::setParam(const std::string &param, const glm::vec2 &val)
 
 void Shader::setParam(const std::string &param, const glm::vec3 &val)
 {
-    int loc = _getUniformLocation(param);
+    int loc = m_getUniformLocation(param);
 
     if (loc != -1)
         glUniform3f(loc, val.x, val.y, val.z);
@@ -164,7 +166,7 @@ void Shader::setParam(const std::string &param, const glm::vec3 &val)
 
 void Shader::setParam(const std::string &param, const glm::vec4 &val)
 {
-    int loc = _getUniformLocation(param);
+    int loc = m_getUniformLocation(param);
 
     if (loc != -1)
         glUniform4f(loc, val.x, val.y, val.z, val.a);
@@ -173,7 +175,7 @@ void Shader::setParam(const std::string &param, const glm::vec4 &val)
 
 void Shader::setParam(const std::string &param, const glm::mat4 &val)
 {
-    int loc = _getUniformLocation(param);
+    int loc = m_getUniformLocation(param);
 
     if (loc != -1)
         glUniformMatrix4fv(loc, 1, GL_FALSE, &val[0][0]);
@@ -181,25 +183,25 @@ void Shader::setParam(const std::string &param, const glm::mat4 &val)
 
 void Shader::setParam(const std::string &param, const Color &val)
 {
-    int loc = _getUniformLocation(param);
+    int loc = m_getUniformLocation(param);
 
     if (loc != -1)
         glUniform4f(loc, val.r, val.g, val.b, val.a);
 }
 
-void Shader::_decrementRefCount()
+void Shader::m_decrementRefCount()
 {
     // Free resource if reference count is 1
     if (dettachRefCount())
     {
-        if (_fragment_shader != RG_INVALID_ID)
-            glDeleteShader(_fragment_shader);
+        if (m_fragment_shader != RG_INVALID_ID)
+            glDeleteShader(m_fragment_shader);
         
-        if (_vertex_shader != RG_INVALID_ID)
-            glDeleteShader(_vertex_shader);
+        if (m_vertex_shader != RG_INVALID_ID)
+            glDeleteShader(m_vertex_shader);
 
-        if (_shader_program != RG_INVALID_ID)
-            glDeleteProgram(_shader_program);
+        if (m_shader_program != RG_INVALID_ID)
+            glDeleteProgram(m_shader_program);
         
         DEBUG_PRINT("Deleting shader");
     }
@@ -207,10 +209,10 @@ void Shader::_decrementRefCount()
 
 void Shader::activate()
 {
-    glUseProgram(_shader_program);
+    glUseProgram(m_shader_program);
 }
 
 Shader::~Shader() 
 {
-    _decrementRefCount();
+    m_decrementRefCount();
 }

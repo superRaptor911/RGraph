@@ -1,13 +1,14 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <RG/deps/glad/glad.h>
+#include <RG/deps/GLFW/glfw3.h>
 #include <unordered_map>
 #include <string>
 
 namespace rg
 {
+    class Window;
     class Keyboard
     {
     private:
@@ -49,13 +50,17 @@ namespace rg
             pair("RIGHT_CONTROL",345), pair("RIGHT_ALT",346), pair("RIGHT_SUPER",347), pair("MENU",348)
          };
 
+         Window *m_window = nullptr;
+
     public:
+
+        Keyboard(Window *window);
         
-        static bool isKeyPressed(const std::string &key);
-        static bool isKeyPressed(const int key_id);
+        bool isKeyPressed(const std::string &key);
+        bool isKeyPressed(const int key_id);
         
-        static bool isKeyReleased(const std::string &key);
-        static bool isKeyReleased(const int key_id);
+        bool isKeyReleased(const std::string &key);
+        bool isKeyReleased(const int key_id);
 
 
 

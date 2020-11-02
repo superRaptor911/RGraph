@@ -12,31 +12,28 @@ namespace rg
     class Shader : public Ref_Base
     {
     private:
-        uint _vertex_shader = RG_INVALID_ID;
-        uint _fragment_shader = RG_INVALID_ID;
-        uint _shader_program = RG_INVALID_ID;
+        uint m_vertex_shader = RG_INVALID_ID;
+        uint m_fragment_shader = RG_INVALID_ID;
+        uint m_shader_program = RG_INVALID_ID;
 
-        std::unordered_map<std::string, int> _param_loc_cache;
+        std::unordered_map<std::string, int> m_param_loc_cache;
 
     private:
 
-        inline int _getUniformLocation(const std::string &param);
-        inline void _decrementRefCount();
-        bool _chkError(uint &id, const std::string &type);
+        inline int m_getUniformLocation(const std::string &param);
+        inline void m_decrementRefCount();
+        bool m_chkError(uint &id, const std::string &type);
     
-    public:
-
-        static Shader DefaultShader;
 
     public:
         Shader();
         Shader(const Shader &shader);
-        Shader(const char *vert_src, const char *frag_src);
+        Shader(const std::string &vert_src, const std::string &frag_src);
 
         Shader &operator = (const Shader &shader);
 
-        bool addVertexShaderSource(const char *src);
-        bool addFragmentShaderSource(const char *src);
+        bool addVertexShaderSource(const std::string &source);
+        bool addFragmentShaderSource(const std::string &source);
         bool createShader();
 
         void setParam(const std::string &param, int val);
@@ -47,7 +44,7 @@ namespace rg
         void setParam(const std::string &param, const glm::mat4 &val);
         void setParam(const std::string &param, const Color &val);
 
-        bool isReady() { return _shader_program != RG_INVALID_ID;}
+        bool isReady() { return m_shader_program != RG_INVALID_ID;}
         void activate();
 
         ~Shader();

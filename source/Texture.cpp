@@ -4,7 +4,7 @@
 #include <RG/r_util.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include <RG/deps/stb_image.h>
 
 using namespace rg;
 
@@ -24,47 +24,47 @@ Texture::Texture(const std::string &path)
 Texture::Texture(const Texture &T)
 {
     // Do ref counting
-    attachToRefCount(T);
+    attachRefCount(T);
     // copy Texture id
-    _texture = T._texture;
+    m_texture_id = T.m_texture_id;
     //Copy size
-    _size = T._size;
+    m_size = T.m_size;
 }
 
 Texture &Texture::operator = (const Texture &T)
 {
     // Decrement ref count and delete Texture if ref vount reaches 0
-    _decrementRefCount();
+    m_decrementRefCount();
     // Do ref counting
-    attachToRefCount(T);
+    attachRefCount(T);
 
     // copy Texture id
-    _texture = T._texture;
+    m_texture_id = T.m_texture_id;
     //Copy size
-    _size = T._size;
+    m_size = T.m_size;
 
     return *this;
 }
 
 bool Texture::operator == (const Texture &T)
 {
-    return (_texture == T._texture);
+    return (m_texture_id == T.m_texture_id);
 }
 
 bool Texture::loadTexture(const std::string &path)
 {
     stbi_set_flip_vertically_on_load(true); 
-    uchar *data = stbi_load(path.c_str(), &_size.x, &_size.y, &_channels, 0);
+    uchar *data = stbi_load(path.c_str(), &m_size.x, &m_size.y, &m_channels, 0);
 
     // Texture was used before
-    if (_texture != RG_INVALID_ID)
-        _decrementRefCount();
+    if (m_texture_id != RG_INVALID_ID)
+        m_decrementRefCount();
 
-    glGenTextures(1, &_texture);
+    glGenTextures(1, &m_texture_id);
     
     // Set as nth Texture
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, _texture);
+    glBindTexture(GL_TEXTURE_2D, m_texture_id);
     // set the texture wrapping/filtering options (on the currently bound texture object)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -77,15 +77,15 @@ bool Texture::loadTexture(const std::string &path)
         // Color format (Default RGB)
         auto clr_format = GL_RGB;
         // Channel 4 = RGBA
-        if (_channels == 4)
+        if (m_channels == 4)
             clr_format = GL_RGBA;
         
-        glTexImage2D(GL_TEXTURE_2D, 0, clr_format, _size.x, _size.y, 0, clr_format, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, clr_format, m_size.x, m_size.y, 0, clr_format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
     {
-       // printf("Error::Failed to load texture %s\n", DirMan::getAliasPath(path).c_str());
+        printf("Error::Failed to load texture %s\n", path.c_str());
         stbi_image_free(data);
         return false;
     }
@@ -96,44 +96,43 @@ bool Texture::loadTexture(const std::string &path)
 
 glm::ivec2 Texture::getSize() const
 {
-    return _size;
+    return m_size;
 }
 
 void Texture::activate(int id)
 {
     glActiveTexture(GL_TEXTURE0 + id);
-    glBindTexture(GL_TEXTURE_2D, _texture);
+    glBindTexture(GL_TEXTURE_2D, m_texture_id);
 }
 
-void Texture::_decrementRefCount()
+void Texture::m_decrementRefCount()
 {
     // Delete resource if value of ref count reaches 0
     if (dettachRefCount())
     {
         // Destroy Texture if exists
-        if (_texture != RG_INVALID_ID)
-            glDeleteTextures(1, &_texture);
+        if (m_texture_id != RG_INVALID_ID)
+            glDeleteTextures(1, &m_texture_id);
 
-        //DEBUG_PRINT("Deleting Texture");
     }
 }
 
 Image Texture::getImage()
 {
-    if (_texture == RG_INVALID_ID)
+    if (m_texture_id == RG_INVALID_ID)
         return Image();
     
-    uchar* data = new uchar[_size.x * _size.y * _channels];
+    uchar* data = new uchar[m_size.x * m_size.y * m_channels];
 
-    if (_channels == 4)
+    if (m_channels == 4)
         glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     else
         glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     
-    return Image(data, _size, _channels);      
+    return Image(data, m_size, m_channels);      
 }
 
 Texture::~Texture()
 {
-    _decrementRefCount();
+    m_decrementRefCount();
 }

@@ -1,99 +1,52 @@
 #ifndef RGRAPH_H
 #define RGRAPH_H
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <RG/deps/glad/glad.h>
+#include <RG/deps/GLFW/glfw3.h>
+#include <RG/Signal.h>
 #include <glm/glm.hpp>
-#include <string>
-#include <RG/Color.h>
-#include <RG/Shader.h>
-#include <vector>
+#include <RG/Window.h>
+#include <list>
+
 
 namespace rg
 {
 	class RGraph
 	{
 	private:
-		float _max_gl_version = -1.f;
-		float _gl_version = -1.f;
-		// Window size
-		glm::ivec2 _win_size;
-		// Screen resolution
-		glm::vec2 _resolution;
-		// Window
-		GLFWwindow* _window;
-		// Name of window
-		std::string _win_name;
-		// counter
-		bool _is_initiated = false;
-		// instance of RGraph
-		static RGraph _Rgraph_instance;
-		// Clear color
-		Color _clear_color;
-		// Projection Matrix
-		glm::mat4 _ortho_proj;
 
-		float _frame_times[2] = {0, 0};
+		float m_GL_version = 0.f;
+		float m_max_GL_version = 0.f;
+		bool m_is_initiated = false;
 
-		// Call backs
-		typedef void (*Void_function) ();
-		
-		// Callbacks
-		std::vector<Void_function> _win_close_callbacks;
-		std::vector<Void_function> _ready2draw_callbacks;
-		std::vector<Void_function> _RGInitiated_callbacks;
-		std::vector<Void_function> _win_resized_callbacks;
+		Window *m_current_window = nullptr;
+		Window m_default_window;
 
 	private:
 
-		RGraph() {}
+		void m_getGLVersion();
 
-		// Called when window is resized
-		static void _handleWindowResize(GLFWwindow* window, int width, int height);
+		static void m_error_callback(int error, const char* description);
 
-		// Called when close button is pressed
-		static void _handleCloseButtonPressed(GLFWwindow * window);
-
-		//
-		void _getGL_version();
+		inline static RGraph *m_instance_ptr = nullptr;
 
 	public:
+
+		RGraph();
 		
-		static bool init(std::string win_name = "NO NAME", glm::ivec2 win_size = glm::ivec2(640, 480));
-		static RGraph &Instance() {return _Rgraph_instance;}
+		Signal<> RGraph_initiated_signal;
+		Signal<> Window_initiated_signal;
 
-		static void setClearColor(const Color &c_color);
-		static Color getClearColor() { return _Rgraph_instance._clear_color;}
+		void getGL_version();
 
-		static void setResolution(const glm::vec2 &res) { _Rgraph_instance._resolution = res;}
-		static glm::vec2 getResolution() {return _Rgraph_instance._resolution;}
+		bool InitRgraph();
 
-		static glm::mat4 getOrthoProgection() { return _Rgraph_instance._ortho_proj;}
+		void TerminateRgraph();
 
-		static GLFWwindow* getWindow() {return _Rgraph_instance._window;}
+		static RGraph *getInstancePtr() { return m_instance_ptr;}
 
-		static void clearScreen();
-
-		static void updateScreen();
-
-		static bool windowOpen();
-
-		static void pollEvents() { glfwPollEvents();}
-
-		static float getTime() { return glfwGetTime();}
-
-		static float getFrameTime() { return (_Rgraph_instance._frame_times[1] - _Rgraph_instance._frame_times[0]);}
-
-		static float getGlVersion() { return _Rgraph_instance._gl_version;}
-
-		static void addCallback_onWindowClose(Void_function func);
-
-		static void addCallback_onReadyToDraw(Void_function func) { _Rgraph_instance._ready2draw_callbacks.push_back(func);}
-
-		static void addCallback_RGInitiated(Void_function func) { _Rgraph_instance._RGInitiated_callbacks.push_back(func);}
-
-		static void addCallback_winResized(Void_function func) { _Rgraph_instance._win_resized_callbacks.push_back(func);}
-
+		Window *getDefaultWindow();
+		
 		~RGraph();
 	};
 	

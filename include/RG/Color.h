@@ -20,19 +20,11 @@ namespace rg
             a = alpha;
         }
 
-        Color(int red, int green, int blue, int alpha = 255)
-        {
-            r = red / 255.f;
-            g = green / 255.f;
-            b = blue / 255.f;
-            a = alpha;
-        }
-
         static Color Red;
         static Color Blue;
         static Color Green;
         static Color Black;
-
+        static Color White;
     };
     
     

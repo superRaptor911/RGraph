@@ -17,15 +17,16 @@ namespace rg
 
     private:
 
-        uchar *_data = nullptr;
+        uchar *m_data = nullptr;
 
-        ImageInfo _img_info;
+        ImageInfo m_img_info;
 
     private:
 
-        inline void _decrementRefCount();
+        inline void m_decrementRefCount();
 
     public:
+    
         Image();
         Image(const std::string &filepath);
         Image(const Image &image);

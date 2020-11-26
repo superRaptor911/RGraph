@@ -4,7 +4,7 @@
 #include <RG/r_util.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <RG/deps/stb_image.h>
+#include <stb_image.h>
 
 using namespace rg;
 

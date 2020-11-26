@@ -1,8 +1,8 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-#include <RG/deps/glad/glad.h>
-#include <RG/deps/GLFW/glfw3.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <unordered_map>
 #include <string>
 

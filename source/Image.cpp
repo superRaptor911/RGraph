@@ -1,9 +1,9 @@
 #include <RG/Image.h>
 #include <RG/r_util.h>
 
-#include <RG/deps/stb_image.h>
+#include <stb_image.h>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <RG/deps/stb_image_write.h>
+#include <stb_image_write.h>
 
 using namespace rg;
 

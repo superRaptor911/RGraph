@@ -1,8 +1,8 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <RG/deps/glad/glad.h>
-#include <RG/deps/GLFW/glfw3.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <RG/Color.h>
 #include <RG/Signal.h>

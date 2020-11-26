@@ -15,7 +15,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 
 #Library
-add_library(RG SHARED source/File.cpp include/RG/deps/glad/glad.c 
+add_library(RG SHARED source/File.cpp deps/headers/glad/glad.c 
 			source/RGraph.cpp source/Color.cpp source/Keyboard.cpp
 			source/Image.cpp source/Window.cpp source/Texture.cpp
 			source/Shader.cpp source/Quad.cpp source/QuadDrawer.cpp
@@ -23,7 +23,7 @@ add_library(RG SHARED source/File.cpp include/RG/deps/glad/glad.c
 			source/QuadBatcher.cpp
 )
 
-target_include_directories(RG PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(RG PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/deps/headers)
 
 message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
 message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")

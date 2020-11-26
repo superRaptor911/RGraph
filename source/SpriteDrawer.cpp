@@ -1,6 +1,6 @@
 #include <RG/SpriteDrawer.h>
-#include <RG/deps/glad/glad.h>
-#include <RG/deps/GLFW/glfw3.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <RG/Window.h>
 
 using namespace rg;

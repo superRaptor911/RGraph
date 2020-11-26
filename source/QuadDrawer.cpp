@@ -1,7 +1,5 @@
 #include <RG/RGraph.h>
 #include <RG/QuadDrawer.h>
-#include <RG/deps/glad/glad.h>
-#include <RG/deps/GLFW/glfw3.h>
 #include <RG/Window.h>
 
 using namespace rg;

@@ -3,6 +3,7 @@
 
 #include <RG/Shader.h>
 #include <RG/Sprite.h>
+#include <vector>
 
 
 namespace rg

@@ -9,19 +9,21 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(CMAKE_CXX_FLAGS "-Wall -std=c++1z -lstdc++fs")
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/deps/glfw)
-add_subdirectory(${CMAKE_SOURCE_DIR}/deps/freetype)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/glfw)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/freetype)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
-include_directories(${CMAKE_SOURCE_DIR}/include)
 
 #Library
-add_library(RG source/File.cpp include/RG/deps/glad/glad.c 
+add_library(RG SHARED source/File.cpp include/RG/deps/glad/glad.c 
 			source/RGraph.cpp source/Color.cpp source/Keyboard.cpp
 			source/Image.cpp source/Window.cpp source/Texture.cpp
 			source/Shader.cpp source/Quad.cpp source/QuadDrawer.cpp
 			source/Sprite.cpp source/SpriteDrawer.cpp source/Drawer.cpp
 			source/QuadBatcher.cpp
 )
+
+target_include_directories(RG PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
 message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")

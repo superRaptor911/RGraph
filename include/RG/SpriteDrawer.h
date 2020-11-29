@@ -11,20 +11,6 @@ namespace rg
     class SpriteDrawer
     {
     private:
-
-        const float m_Vertex_data[16] = {
-            // positions         // texture coords
-             0.f,   1.f,   1.0f, 1.0f, // top right
-             1.f,   1.f,   0.0f, 1.0f, // bottom right
-             1.f,   0.f,   0.0f, 0.0f, // bottom left
-             0.f,   0.f,   1.0f, 0.0f  // top left 
-        };
-
-        const uint m_Indices[6] = {
-            0, 1, 2, // first triangle
-            2, 3, 0  // second triangle
-        };
-
         uint m_VAO;
         uint  m_VBO, m_EBO;
 

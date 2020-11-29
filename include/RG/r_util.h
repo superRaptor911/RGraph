@@ -17,7 +17,7 @@
 #include <chrono>
 #include <thread>
 
-#define Testing
+//#define Testing
 
 // Macros
 #define R_CPRINT_ERR(msg) printf("Error : %s:%d \n----------> %s\n",  __FILE__, __LINE__, msg);

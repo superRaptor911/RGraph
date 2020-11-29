@@ -9,8 +9,20 @@ SpriteDrawer::SpriteDrawer(Window *window)
 {
     m_window = window;
 
+    const float m_Vertex_data[8] = {
+        // positions and texture coords
+            0.f,   1.f,
+            1.f,   1.f,
+            1.f,   0.f,
+            0.f,   0.f
+    };
 
-    int vertex_size = sizeof(float) * 4;
+    const uint m_Indices[6] = {
+        0, 1, 2, // first triangle
+        2, 3, 0  // second triangle
+    };
+
+    int vertex_size = sizeof(float) * 2;
 
     glGenVertexArrays(1, &m_VAO);
     glGenBuffers(1, &m_VBO);
@@ -28,14 +40,10 @@ SpriteDrawer::SpriteDrawer(Window *window)
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, vertex_size, (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, vertex_size, (void*)(sizeof(float) * 2));
-    glEnableVertexAttribArray(1);
-
     glBindVertexArray(0);
 
     std::string vertex_source = "#version 420 core\n"
                                 "layout (location = 0) in vec2 vpos;\n"
-                                "layout (location = 1) in vec2 texCoord;\n"
                                 "out vec2 uv;\n"
 
                                 "uniform mat4 proj;\n"
@@ -44,7 +52,7 @@ SpriteDrawer::SpriteDrawer(Window *window)
                                 "void main()\n"
                                 "{\n"
                                     " gl_Position = proj * model * vec4(vpos, 0.0, 1.0);\n"
-                                    " uv = texCoord;\n"
+                                    " uv = vpos;\n"
                                 "}\n";
     
     std::string frag_source = "#version 420 core\n"

@@ -57,7 +57,7 @@ namespace rg
 
         Color getColor() { return m_color;}
 
-        void setSize(const glm::vec2 &sz) { m_size = sz; m_origin = sz / 2.f; m_transformation_changed = true;}
+        void setSize(const glm::vec2 &sz) { m_size = sz; m_transformation_changed = true;}
 
         glm::mat4 getTransformMatrix();
 

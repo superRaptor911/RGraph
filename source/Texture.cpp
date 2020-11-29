@@ -31,6 +31,14 @@ Texture::Texture(const Texture &T)
     m_size = T.m_size;
 }
 
+Texture::Texture(uint gl_Texture, int channels)
+{
+    // Start Reference counting
+    startRefCounting();
+    m_texture_id = gl_Texture;
+    m_channels = channels;
+}
+
 Texture &Texture::operator = (const Texture &T)
 {
     // Decrement ref count and delete Texture if ref vount reaches 0
@@ -53,12 +61,14 @@ bool Texture::operator == (const Texture &T)
 
 bool Texture::loadTexture(const std::string &path)
 {
-    stbi_set_flip_vertically_on_load(true); 
     uchar *data = stbi_load(path.c_str(), &m_size.x, &m_size.y, &m_channels, 0);
 
     // Texture was used before
     if (m_texture_id != RG_INVALID_ID)
+    {
         m_decrementRefCount();
+        startRefCounting();
+	}
 
     glGenTextures(1, &m_texture_id);
     
@@ -75,10 +85,18 @@ bool Texture::loadTexture(const std::string &path)
     if (data)
     {
         // Color format (Default RGB)
-        auto clr_format = GL_RGB;
-        // Channel 4 = RGBA
-        if (m_channels == 4)
-            clr_format = GL_RGBA;
+        auto clr_format = GL_RGBA;
+        switch (m_channels)
+        {
+        case 3:
+            clr_format = GL_RGB;
+            break;
+        case 1:
+            clr_format = GL_RED;
+            break;
+        default:
+            break;
+        }
         
         glTexImage2D(GL_TEXTURE_2D, 0, clr_format, m_size.x, m_size.y, 0, clr_format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -124,11 +142,20 @@ Image Texture::getImage()
     
     uchar* data = new uchar[m_size.x * m_size.y * m_channels];
 
-    if (m_channels == 4)
-        glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    else
-        glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    
+    auto clr_format = GL_RGBA;
+    switch (m_channels)
+    {
+    case 3:
+        clr_format = GL_RGB;
+        break;
+    case 1:
+        clr_format = GL_RED;
+        break;
+    default:
+        break;
+    }
+
+    glGetTexImage(GL_TEXTURE_2D, 0, clr_format, GL_UNSIGNED_BYTE, data);    
     return Image(data, m_size, m_channels);      
 }
 

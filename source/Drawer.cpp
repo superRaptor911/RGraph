@@ -12,7 +12,7 @@ Drawer::Drawer(Window *window)
 {
     if (!window)
     {
-        m_window = RGraph::getInstancePtr()->getDefaultWindow();
+        window = RGraph::getInstancePtr()->getDefaultWindow();
     }
     
     m_window = window;

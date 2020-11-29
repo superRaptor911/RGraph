@@ -11,9 +11,12 @@ namespace rg
     class Texture : public Ref_Base
     {     
     private:
+        // Handle to texture
         uint m_texture_id = RG_INVALID_ID;
+        // Texture size 
         glm::ivec2 m_size;
-        int m_channels;
+        // channels, 4 for rgba
+        int m_channels = RG_INVALID_ID;
 
     private:
 
@@ -29,6 +32,8 @@ namespace rg
         Texture &operator = (const Texture &T);
         // Load texture from file
         Texture(const std::string &path);
+        // Load from gl
+        Texture(uint gl_Texture, int channels = 4);
         
         bool operator == (const Texture &T);
 

@@ -1,28 +1,42 @@
 #include <RG/RGraph.h>
-#include <RG/r_util.h>
+#include <RG/Font.h>
 #include <RG/Drawer.h>
+
+#include <RG/Shader.h>
 #include <RG/File.h>
 
 int main()
-{
-    rg::RGraph RG;
-    RG.InitRgraph();
-    
-    rg::Quad quad;
-    quad.setSize(glm::vec2(100, 100));
-    quad.setPosition(glm::vec2(300,300));
-    quad.setColor(rg::Color::Green);
- 
-    rg::Window *w = RG.getDefaultWindow();
-    w->setClearColor(rg::Color::Blue);
-    rg::Drawer drawer(w);
+{	
+	rg::RGraph rgraph;
+	rgraph.InitRgraph();
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	rg::Texture t;
+	t.loadTexture("textures/m1.png");
 
-    while (w->windowOpen())
+	rg::Sprite q;
+	q.setPosition(glm::vec2(500,400));
+	
+	q.setTexture(t);
+	q.setSize(glm::vec2(200,200));
+
+
+	rg::Font f;
+	f.loadFont("fonts/arial.ttf");
+	
+	auto win = rgraph.getDefaultWindow();
+	rg::Drawer dr;
+	win->setClearColor(rg::Color::Blue);
+
+
+    while (win->windowOpen())
     {
-        w->clearScreen();       
-        drawer.draw(quad);
-        w->updateScreen();
+        win->clearScreen();
+		f.drawText("abcggggg");
+		dr.draw(q);
+        win->updateScreen();
     }
-    
-    return 0;
+	
+	int i;
+	scanf("%d", &i);
+	return 0;
 }

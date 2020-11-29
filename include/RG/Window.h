@@ -43,7 +43,7 @@ namespace rg
         void updateScreen();
         bool windowOpen();
 
-        const glm::mat4 &getOrthoProjection() { return m_ortho_projection;}
+        glm::mat4 getOrthoProjection() { return m_ortho_projection;}
         GLFWwindow *getGLFWWindow();
 
         int getFPS();

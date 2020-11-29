@@ -10,7 +10,7 @@ void Quad::m_getTransformMatrix()
 {
     glm::mat4 model = glm::mat4(1.0f);
 
-    model = glm::translate(model, glm::vec3(m_origin * m_scale + m_position, 0.0f)); 
+    model = glm::translate(model, glm::vec3(m_position, 0.0f)); 
     model = glm::rotate(model, m_rotation, glm::vec3(0.0f, 0.0f, 1.0f)); 
     model = glm::translate(model, glm::vec3(-m_origin * m_scale, 0.0f));
     model = glm::scale(model, glm::vec3(m_size  * m_scale, 1.0f));

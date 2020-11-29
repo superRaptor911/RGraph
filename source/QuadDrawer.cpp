@@ -13,6 +13,19 @@ QuadDrawer::QuadDrawer(Window *window)
 
 void QuadDrawer::m_Init()
 {
+    const float vertex_data[8] = {
+        // positions         // texture coords
+            0.f,   1.f,
+            1.f,   1.f,
+            1.f,   0.f,
+            0.f,   0.f
+    };
+
+    const uint indices[6] = {
+        0, 1, 2, // first triangle
+        2, 3, 0  // second triangle
+    };
+
     int vertex_size = sizeof(float) * 2;
 
     glGenVertexArrays(1, &m_VAO);
@@ -23,10 +36,10 @@ void QuadDrawer::m_Init()
 
     // position attribute
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-    glBufferData(GL_ARRAY_BUFFER, 4 * vertex_size, m_Vertex_data, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 4 * vertex_size, vertex_data, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(uint), m_Indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(uint), indices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, vertex_size, (void*)0);
     glEnableVertexAttribArray(0);

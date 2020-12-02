@@ -2,13 +2,13 @@
 
 using namespace rg;
 
-Sprite::Sprite(Texture &texture)
+Sprite::Sprite(const Texture &texture)
 {
     setTexture(texture);
 }
 
 
-void Sprite::setTexture(Texture &texture)
+void Sprite::setTexture(const Texture &texture)
 {
     m_texture = texture;
     m_size = texture.getSize();

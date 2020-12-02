@@ -22,7 +22,7 @@ add_library(RG source/File.cpp deps/headers/glad/glad.c
 			source/Image.cpp source/Window.cpp source/Texture.cpp
 			source/Shader.cpp source/Quad.cpp source/QuadDrawer.cpp
 			source/Sprite.cpp source/SpriteDrawer.cpp source/Drawer.cpp
-			source/QuadBatcher.cpp source/Font.cpp
+			source/QuadBatcher.cpp source/Font.cpp source/RenderSurface.cpp
 )
 
 target_include_directories(RG PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/deps/headers)

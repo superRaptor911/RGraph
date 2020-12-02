@@ -9,12 +9,12 @@ SpriteDrawer::SpriteDrawer(Window *window)
 {
     m_window = window;
 
-    const float m_Vertex_data[8] = {
+    const float m_Vertex_data[16] = {
         // positions and texture coords
-            0.f,   1.f,
-            1.f,   1.f,
-            1.f,   0.f,
-            0.f,   0.f
+            0.f,   1.f,     0.f,   0.f,
+            1.f,   1.f,     1.f,   0.f,
+            1.f,   0.f,     1.f,   1.f,
+            0.f,   0.f,     0.f,   1.f
     };
 
     const uint m_Indices[6] = {
@@ -22,7 +22,7 @@ SpriteDrawer::SpriteDrawer(Window *window)
         2, 3, 0  // second triangle
     };
 
-    int vertex_size = sizeof(float) * 2;
+    int vertex_size = sizeof(float) * 4;
 
     glGenVertexArrays(1, &m_VAO);
     glGenBuffers(1, &m_VBO);
@@ -37,13 +37,13 @@ SpriteDrawer::SpriteDrawer(Window *window)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(uint), m_Indices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, vertex_size, (void*)0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, vertex_size, (void*)0);
     glEnableVertexAttribArray(0);
 
     glBindVertexArray(0);
 
     std::string vertex_source = "#version 420 core\n"
-                                "layout (location = 0) in vec2 vpos;\n"
+                                "layout (location = 0) in vec4 vpos;\n"
                                 "out vec2 uv;\n"
 
                                 "uniform mat4 proj;\n"
@@ -51,8 +51,8 @@ SpriteDrawer::SpriteDrawer(Window *window)
 
                                 "void main()\n"
                                 "{\n"
-                                    " gl_Position = proj * model * vec4(vpos, 0.0, 1.0);\n"
-                                    " uv = vpos;\n"
+                                    " gl_Position = proj * model * vec4(vpos.xy, 0.0, 1.0);\n"
+                                    " uv = vpos.zw;\n"
                                 "}\n";
     
     std::string frag_source = "#version 420 core\n"

@@ -20,9 +20,9 @@ namespace rg
 
         Sprite() { m_color = Color::White;};
 
-        Sprite(Texture &texture);
+        Sprite(const Texture &texture);
 
-        void setTexture(Texture &texture);
+        void setTexture(const Texture &texture);
 
         Texture getTexture();
 

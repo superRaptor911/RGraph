@@ -17,23 +17,26 @@ namespace rg
 			glm::ivec2   Size;		// Size of glyph
 			glm::ivec2   Bearing;	// Offset from baseline to left/top of glyph
 			long Advance;    		// Offset to advance to next glyph
+			long offset = 0;
 		};
 
 		int m_size = 12;
 		std::map<char, Character> m_characters;
 
 		Shader shader;
-		unsigned int m_VAO, m_VBO, m_EBO;
+		uint m_VAO, m_VBO, m_EBO;
 		
+	public:
+
+		uint tex;
+
+	private:
+			 
+		inline void m_decrementRefCount();
+		// Free Glyphs
+		void m_freeGlyphs();
 		
-		private:
-			
-			// 
-			inline void m_decrementRefCount();
-			// Free Glyphs
-			void m_freeGlyphs();
-		
-		public:
+	public:
 		
 		Font();
 		Font(const std::string &path);

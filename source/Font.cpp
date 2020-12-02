@@ -49,6 +49,9 @@ Font &Font::operator = (Font &f)
 	return *this;
 }
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 bool Font::loadFont(const std::string &path)
 {
 	// Handle previously loaded font
@@ -79,7 +82,9 @@ bool Font::loadFont(const std::string &path)
 	
 	FT_Set_Pixel_Sizes(face, 0, 48);
 	// Disable byte-alignment restriction
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); 
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	long f_offset = 0;
 	  
 	for (unsigned char c = 0; c < 128; c++)
 	{
@@ -115,8 +120,10 @@ bool Font::loadFont(const std::string &path)
 			texture, 
 			glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
 			glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-			face->glyph->advance.x
+			(face->glyph->advance.x >> 6),
+			f_offset
 		};
+		f_offset += character.Advance;
 		m_characters.insert(std::pair<char, Character>(c, character));
 	}
 	
@@ -143,9 +150,9 @@ bool Font::loadFont(const std::string &path)
 		2, 3, 0  // second triangle
 	};
 
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // glEnable(GL_CULL_FACE);
+    // glEnable(GL_BLEND);
+    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
 	int vertex_size = sizeof(float) * 2;
 	
@@ -165,6 +172,95 @@ bool Font::loadFont(const std::string &path)
     glEnableVertexAttribArray(0);
 
     glBindVertexArray(0);
+
+	/////////////////////////////////////////////////////////////
+
+	unsigned int framebuffer;
+	glGenFramebuffers(1, &framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);   
+	
+	unsigned int texColorBuffer;
+	glGenTextures(1, &texColorBuffer);
+	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 800, 600, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// attach it to currently bound framebuffer object
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
+	unsigned int rbo;
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo); 
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);  
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+
+	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		R_CPRINT_ERR("Framebuffer not complete!!");
+		exit(1);
+	}
+
+	// glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	// glClearColor(0.f, 0.f, 0.f, 0.f);
+	// glClear(GL_COLOR_BUFFER_BIT);
+
+	// first pass
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
+	glEnable(GL_DEPTH_TEST);
+
+	shader.setParam("textColor", glm::vec3(0.5f, 0.8f, 0.2f));
+	shader.setParam("proj", glm::ortho(0.0f, 800.f, 600.f, 0.0f, -1.0f, 1.0f));
+	shader.activate();
+
+	Quad q;
+	QuadDrawer qd(RGraph::getInstancePtr()->getDefaultWindow());
+
+	q.setPosition(glm::vec2(10,10));
+	q.setSize(glm::vec2(100,100));
+	q.setColor(Color::Blue);
+	qd.drawQuad(q);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
+	tex = texColorBuffer;
+
+	return true;
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindVertexArray(m_VAO);
+	
+
+
+	Character chr = m_characters[uchar(65)];
+	long index = chr.offset;
+	for (uchar c = 65; c < 70; c++)
+	{
+        Character ch = m_characters[c];
+
+        float xpos = ch.offset - index + ch.Bearing.x;
+        float ypos = 40-ch.Bearing.y;
+        float w = ch.Size.x;
+        float h = ch.Size.y;
+
+		printf("pos : (%f, %f) | sz : (%f, %f)\n", xpos, ypos, w, h);
+
+		q.setPosition(glm::vec2(xpos,ypos));
+		q.setSize(glm::vec2(w, h));
+		//q.setScale(glm::vec2(1,-1));
+		shader.setParam("model", q.getTransformMatrix());
+
+        // render glyph texture over quad
+        glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);		
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0,0,1024,768);
+	tex = texColorBuffer;
+
 	return true;
 }
 
@@ -173,7 +269,7 @@ void Font::drawText(const std::string &str)
 {
     float x=100, y=100;
 	//glm::ortho(0.0f, 1024.f, 0.0f, 768.f);
-	// shader.setParam("textColor", glm::vec3(0.5f, 0.8f, 0.2f));
+	shader.setParam("textColor", glm::vec3(0.5f, 0.8f, 0.2f));
 	shader.setParam("proj", RGraph::getInstancePtr()->getDefaultWindow()->getOrthoProjection());
 	shader.activate();
 

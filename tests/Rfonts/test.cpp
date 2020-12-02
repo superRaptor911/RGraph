@@ -10,19 +10,17 @@ int main()
 	rg::RGraph rgraph;
 	rgraph.InitRgraph();
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	rg::Texture t;
-	t.loadTexture("textures/m1.png");
-
-	rg::Sprite q;
-	q.setPosition(glm::vec2(500,400));
 	
-	q.setTexture(t);
-	q.setSize(glm::vec2(200,200));
-
-
 	rg::Font f;
 	f.loadFont("fonts/arial.ttf");
-	
+
+	rg::Texture t(f.tex, glm::vec2(800.f, 600.f), 4);
+
+	rg::Sprite q;
+	q.setPosition(glm::vec2(100,100));
+	q.setTexture(t);
+
+
 	auto win = rgraph.getDefaultWindow();
 	rg::Drawer dr;
 	win->setClearColor(rg::Color::Blue);
@@ -31,7 +29,7 @@ int main()
     while (win->windowOpen())
     {
         win->clearScreen();
-		f.drawText("abcggggg");
+		//f.drawText("abcggggg");
 		dr.draw(q);
         win->updateScreen();
     }

@@ -20,7 +20,7 @@ namespace rg
 
     private:
 
-        inline void m_decrementRefCount();
+        inline void m_detachRef();
 
     public:
         
@@ -33,7 +33,7 @@ namespace rg
         // Load texture from file
         Texture(const std::string &path);
         // Load from gl
-        Texture(uint gl_Texture, int channels = 4);
+        Texture(uint gl_Texture, const glm::vec2 &sz, int channels = 4);
         
         bool operator == (const Texture &T);
 
@@ -53,6 +53,9 @@ namespace rg
         uint getTextureID() { return m_texture_id;}
 
         Image getImage();
+
+        // Destroy texture, will not affect other sharing Textures
+        void destroy();
 
         ~Texture();
     };    

@@ -202,8 +202,6 @@ void Shader::m_decrementRefCount()
 
         if (m_shader_program != RG_INVALID_ID)
             glDeleteProgram(m_shader_program);
-        
-        DEBUG_PRINT("Deleting shader");
     }
 }
 

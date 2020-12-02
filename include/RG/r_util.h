@@ -17,18 +17,10 @@
 #include <chrono>
 #include <thread>
 
-//#define Testing
-
 // Macros
-#define R_CPRINT_ERR(msg) printf("Error : %s:%d \n----------> %s\n",  __FILE__, __LINE__, msg);
+#define R_CPRINT_ERR(msg) printf("Error : %s\n", msg);
 #define R_CPRINT(msg) printf("%s.\n",msg);
 #define R_CPRINT_WARN(msg) printf("Warning : %s.\n", msg);
-
-#ifdef Testing
-#define DEBUG_PRINT(msg) printf("Message : %s.\n", msg);
-#else
-#define DEBUG_PRINT(msg) ;
-#endif
 
 
 namespace rg

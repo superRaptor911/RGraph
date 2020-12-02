@@ -31,18 +31,19 @@ Texture::Texture(const Texture &T)
     m_size = T.m_size;
 }
 
-Texture::Texture(uint gl_Texture, int channels)
+Texture::Texture(uint gl_Texture, const glm::vec2 &sz,int channels)
 {
     // Start Reference counting
     startRefCounting();
     m_texture_id = gl_Texture;
     m_channels = channels;
+    m_size = sz;
 }
 
 Texture &Texture::operator = (const Texture &T)
 {
     // Decrement ref count and delete Texture if ref vount reaches 0
-    m_decrementRefCount();
+    m_detachRef();
     // Do ref counting
     attachRefCount(T);
 
@@ -61,15 +62,17 @@ bool Texture::operator == (const Texture &T)
 
 bool Texture::loadTexture(const std::string &path)
 {
+
+    stbi_set_flip_vertically_on_load(true); 
     uchar *data = stbi_load(path.c_str(), &m_size.x, &m_size.y, &m_channels, 0);
 
-    // Texture was used before
+    // Texture active
     if (m_texture_id != RG_INVALID_ID)
     {
-        m_decrementRefCount();
-        startRefCounting();
+        destroy();
 	}
 
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glGenTextures(1, &m_texture_id);
     
     // Set as nth Texture
@@ -97,7 +100,7 @@ bool Texture::loadTexture(const std::string &path)
         default:
             break;
         }
-        
+                
         glTexImage2D(GL_TEXTURE_2D, 0, clr_format, m_size.x, m_size.y, 0, clr_format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
@@ -123,7 +126,7 @@ void Texture::activate(int id)
     glBindTexture(GL_TEXTURE_2D, m_texture_id);
 }
 
-void Texture::m_decrementRefCount()
+void Texture::m_detachRef()
 {
     // Delete resource if value of ref count reaches 0
     if (dettachRefCount())
@@ -131,8 +134,9 @@ void Texture::m_decrementRefCount()
         // Destroy Texture if exists
         if (m_texture_id != RG_INVALID_ID)
             glDeleteTextures(1, &m_texture_id);
-
     }
+
+    m_texture_id = RG_INVALID_ID;
 }
 
 Image Texture::getImage()
@@ -159,7 +163,14 @@ Image Texture::getImage()
     return Image(data, m_size, m_channels);      
 }
 
+// Detach previous ref and create new
+void Texture::destroy()
+{
+    m_detachRef();
+    startRefCounting();
+}
+
 Texture::~Texture()
 {
-    m_decrementRefCount();
+    m_detachRef();
 }

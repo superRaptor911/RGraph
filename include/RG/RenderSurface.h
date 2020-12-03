@@ -47,7 +47,7 @@ namespace rg
         // Clear Surface
         void clear();
         // Set as current surface
-        bool activate();
+        bool activate() const;
         // Switch to default surface, (screen)
         void deactivate();
         // Set clear color

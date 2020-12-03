@@ -1,14 +1,10 @@
 #include <RG/SpriteDrawer.h>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <RG/Window.h>
+#include <RG/RGraph.h>
 
 using namespace rg;
 
-SpriteDrawer::SpriteDrawer(Window *window)
+SpriteDrawer::SpriteDrawer()
 {
-    m_window = window;
-
     const float m_Vertex_data[16] = {
         // positions and texture coords
             0.f,   1.f,     0.f,   0.f,
@@ -76,12 +72,27 @@ SpriteDrawer::SpriteDrawer(Window *window)
 void SpriteDrawer::drawSprite(Sprite &sprite)
 {
     m_shader.activate();
-    m_shader.setParam("proj", m_window->getOrthoProjection());
+    m_shader.setParam("proj", RGraph::getInstancePtr()->getDefaultWindow()->getOrthoProjection());
     m_shader.setParam("model", sprite.getTransformMatrix());
     m_shader.setParam("color", sprite.m_color);
     sprite.m_texture.activate();
 
-    //printf("(%f, %f)\n", sprite.m_size.x, sprite.m_size.y);
+    // Activate default framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindVertexArray(m_VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+
+void SpriteDrawer::drawSprite(Sprite &sprite, const RenderSurface &rs)
+{
+    rs.activate();
+    m_shader.activate();
+    m_shader.setParam("proj", rs.getOrthoProjection());
+    m_shader.setParam("model", sprite.getTransformMatrix());
+    m_shader.setParam("color", sprite.m_color);
+    sprite.m_texture.activate();
+
     glBindVertexArray(m_VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }

@@ -8,18 +8,11 @@
 using namespace rg;
 
 
-Drawer::Drawer(Window *window)
+Drawer::Drawer()
 {
-    if (!window)
-    {
-        window = RGraph::getInstancePtr()->getDefaultWindow();
-    }
-    
-    m_window = window;
-    m_sprite_drawer = new SpriteDrawer(m_window);
-    m_quad_drawer = new QuadDrawer(m_window);
-
-    m_quad_batcher = new QuadBatcher(m_window);
+    m_sprite_drawer = new SpriteDrawer;
+    m_quad_drawer = new QuadDrawer;
+    m_quad_batcher = new QuadBatcher;
 }
 
 
@@ -35,11 +28,22 @@ void Drawer::draw(Quad &quad)
     m_quad_drawer->drawQuad(quad);
 }
 
+void Drawer::draw(Quad &quad, const RenderSurface &rs)
+{
+    m_quad_drawer->drawQuad(quad, rs);
+}
+
 
 void Drawer::draw(Sprite &sprite)
 {
     m_sprite_drawer->drawSprite(sprite);
 }
+
+void Drawer::draw(Sprite &sprite, const RenderSurface &rs)
+{
+    m_sprite_drawer->drawSprite(sprite, rs);
+}
+
 
 void Drawer::addToBatch(Quad &quad)
 {

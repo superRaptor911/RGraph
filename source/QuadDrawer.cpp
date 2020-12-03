@@ -5,16 +5,10 @@
 using namespace rg;
 
 
-QuadDrawer::QuadDrawer(Window *window)
-{
-    m_window = window;
-    m_Init();
-}
-
-void QuadDrawer::m_Init()
+QuadDrawer::QuadDrawer()
 {
     const float vertex_data[8] = {
-        // positions         // texture coords
+        // positions
             0.f,   1.f,
             1.f,   1.f,
             1.f,   0.f,
@@ -70,18 +64,32 @@ void QuadDrawer::m_Init()
     m_shader.addVertexShaderSource(vertex_source);
     m_shader.addFragmentShaderSource(frag_source);
     m_shader.createShader();// = Shader(vertex_source, frag_source);
-    printf("Called\n");
 }
-
 
 void QuadDrawer::drawQuad(Quad &quad)
 {
     m_shader.activate();
-    m_shader.setParam("proj", m_window->getOrthoProjection());
+    m_shader.setParam("proj", RGraph::getInstancePtr()->getDefaultWindow()->getOrthoProjection());
+    m_shader.setParam("model", quad.getTransformMatrix());
+    m_shader.setParam("color", quad.m_color);
+
+    // Activate default framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindVertexArray(m_VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
+
+
+void QuadDrawer::drawQuad(Quad &quad, const RenderSurface &rs)
+{
+    rs.activate();
+    m_shader.activate();
+    m_shader.setParam("proj", rs.getOrthoProjection());
     m_shader.setParam("model", quad.getTransformMatrix());
     m_shader.setParam("color", quad.m_color);
 
     glBindVertexArray(m_VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+    glBindVertexArray(0);   
 }

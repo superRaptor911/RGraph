@@ -1,14 +1,10 @@
 #include <RG/QuadBatcher.h>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <RG/Window.h>
+#include <RG/RGraph.h>
 
 using namespace rg;
 
-QuadBatcher::QuadBatcher(Window *window)
+QuadBatcher::QuadBatcher()
 {
-    m_window = window;
-
     const char *vertex_source = "#version 330 core\n"
                                 "layout (location = 0) in vec2 vpos;\n"
                                 "layout (location = 1) in vec4 instanceColor;\n"
@@ -104,7 +100,10 @@ void QuadBatcher::draw(std::vector<Quad> &quads)
     int quads_remaining = quad_count;
 
     m_shader.activate();
-    m_shader.setParam("proj", m_window->getOrthoProjection());
+    m_shader.setParam("proj",  RGraph::getInstancePtr()->getDefaultWindow()->getOrthoProjection());
+    
+    // Activate default framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     for (int i = 0; i < batch_count; i++)
     {

@@ -1,12 +1,11 @@
 #include <RG/r_util.h>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <RG/Font.h>
 #include <RG/File.h>
 #include <RG/RGraph.h>
 #include <ft2build.h>
 #include <RG/Quad.h>
 #include <RG/QuadDrawer.h>
+#include <RG/RenderSurface.h>
 #include FT_FREETYPE_H
 
 
@@ -48,9 +47,6 @@ Font &Font::operator = (Font &f)
     
 	return *this;
 }
-
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 bool Font::loadFont(const std::string &path)
 {
@@ -175,64 +171,27 @@ bool Font::loadFont(const std::string &path)
 
 	/////////////////////////////////////////////////////////////
 
-	unsigned int framebuffer;
-	glGenFramebuffers(1, &framebuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);   
-	
-	unsigned int texColorBuffer;
-	glGenTextures(1, &texColorBuffer);
-	glBindTexture(GL_TEXTURE_2D, texColorBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 800, 600, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	// attach it to currently bound framebuffer object
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColorBuffer, 0);
-	unsigned int rbo;
-	glGenRenderbuffers(1, &rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, rbo); 
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);  
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-
-	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-	{
-		R_CPRINT_ERR("Framebuffer not complete!!");
-		exit(1);
-	}
-
-	// glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-	// glClearColor(0.f, 0.f, 0.f, 0.f);
-	// glClear(GL_COLOR_BUFFER_BIT);
-
-	// first pass
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
-	glEnable(GL_DEPTH_TEST);
+	RenderSurface rs(800, 600);
+	rs.activate();
 
 	shader.setParam("textColor", glm::vec3(0.5f, 0.8f, 0.2f));
-	shader.setParam("proj", glm::ortho(0.0f, 800.f, 600.f, 0.0f, -1.0f, 1.0f));
+	shader.setParam("proj", rs.getOrthoProjection());
 	shader.activate();
 
 	Quad q;
-	QuadDrawer qd(RGraph::getInstancePtr()->getDefaultWindow());
+	QuadDrawer qd;
 
 	q.setPosition(glm::vec2(10,10));
 	q.setSize(glm::vec2(100,100));
 	q.setColor(Color::Blue);
 	qd.drawQuad(q);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
-	tex = texColorBuffer;
+
 
 	return true;
 
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(m_VAO);
-	
-
 
 	Character chr = m_characters[uchar(65)];
 	long index = chr.offset;
@@ -259,7 +218,7 @@ bool Font::loadFont(const std::string &path)
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0,0,1024,768);
-	tex = texColorBuffer;
+	// tex = texColorBuffer;
 
 	return true;
 }

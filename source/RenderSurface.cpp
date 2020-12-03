@@ -3,6 +3,9 @@
 #include <GLFW/glfw3.h>
 #include <RG/r_util.h>
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 using namespace rg;
 
 RenderSurface::RenderSurface()
@@ -85,15 +88,17 @@ bool RenderSurface::generate()
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     {
         R_CPRINT_WARN("RenderSurface : Failed to generate framebuffer");
+        destroy();
         return false;
     }
 
+    m_ortho_proj = glm::ortho(0.0f, float(m_size.x), float(m_size.y), 0.0f, -1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     return true;
 }
 
-bool RenderSurface::activate()
+bool RenderSurface::activate() const
 {
     if (m_framebuffer == RG_INVALID_ID)
         return false;

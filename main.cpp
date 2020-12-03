@@ -15,7 +15,7 @@ int main()
  
     rg::Window *w = RG.getDefaultWindow();
     w->setClearColor(rg::Color::Blue);
-    rg::Drawer drawer(w);
+    rg::Drawer drawer;
 
     while (w->windowOpen())
     {

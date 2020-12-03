@@ -4,6 +4,7 @@
 #include <RG/Global_Def.h>
 #include <RG/Sprite.h>
 #include <RG/Shader.h>
+#include <RG/RenderSurface.h>
 
 namespace rg
 {
@@ -16,12 +17,11 @@ namespace rg
 
         Shader m_shader;
 
-        Window *m_window = nullptr;
-
-
     public:
-        SpriteDrawer(Window *window);
+
+        SpriteDrawer();
         void drawSprite(Sprite &sprite);
+        void drawSprite(Sprite &sprite, const RenderSurface &rs);
     };
 }
 

@@ -15,7 +15,6 @@ namespace rg
         uint  m_VBO, m_EBO, m_trans_buffer, m_color_buffer;
 
         Shader m_shader;
-        Window *m_window;
 
         const int m_Max_Units = 10000;
 
@@ -37,8 +36,7 @@ namespace rg
 
     public:
 
-        QuadBatcher(Window *window);
-
+        QuadBatcher();
         void draw(std::vector<Quad> &quads);
 
     };   

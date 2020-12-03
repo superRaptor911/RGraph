@@ -66,7 +66,7 @@ bool Texture::loadTexture(const std::string &path)
     stbi_set_flip_vertically_on_load(true); 
     uchar *data = stbi_load(path.c_str(), &m_size.x, &m_size.y, &m_channels, 0);
 
-    // Texture active
+    // Destroy active Texture active
     if (m_texture_id != RG_INVALID_ID)
     {
         destroy();
@@ -159,8 +159,8 @@ Image Texture::getImage()
         break;
     }
 
-    glGetTexImage(GL_TEXTURE_2D, 0, clr_format, GL_UNSIGNED_BYTE, data);    
-    return Image(data, m_size, m_channels);      
+    glGetTexImage(GL_TEXTURE_2D, 0, clr_format, GL_UNSIGNED_BYTE, data);
+    return Image(data, m_size, m_channels);
 }
 
 // Detach previous ref and create new

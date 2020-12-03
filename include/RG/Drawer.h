@@ -3,6 +3,7 @@
 
 #include <RG/Quad.h>
 #include <RG/Sprite.h>
+#include <RG/RenderSurface.h>
 #include <vector>
 
 namespace rg
@@ -17,7 +18,7 @@ namespace rg
 
         SpriteDrawer *m_sprite_drawer = nullptr;
         QuadDrawer *m_quad_drawer = nullptr;
-        QuadBatcher *m_quad_batcher;
+        QuadBatcher *m_quad_batcher = nullptr;
         Window *m_window;
 
         std::vector<Quad> m_quad_draw_queue;
@@ -29,15 +30,19 @@ namespace rg
 
     public:
 
-        Drawer(Window *window = nullptr);
+        Drawer();
 
         void draw(Quad &quad);
+        void draw(Quad &quad, const RenderSurface &rs);
         void draw(Sprite &sprite);
+        void draw(Sprite &sprite, const RenderSurface &rs);
 
         void addToBatch(Quad &quad);
         void addToBatch(Sprite &sprite);
 
         void drawBatch();
+        void drawBatch(const RenderSurface &rs);
+        
         ~Drawer();
     };
     

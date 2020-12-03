@@ -4,6 +4,7 @@
 #include <RG/Global_Def.h>
 #include <RG/Quad.h>
 #include <RG/Shader.h>
+#include <RG/RenderSurface.h>
 
 namespace rg
 {
@@ -14,17 +15,12 @@ namespace rg
         uint m_VAO;
         uint  m_VBO, m_EBO;
         Shader m_shader;
-        Window *m_window = nullptr;
-
-    private:
-
-        void m_Init();
 
     public:
 
-        QuadDrawer(Window *window);
+        QuadDrawer();
         void drawQuad(Quad &quad);
-
+        void drawQuad(Quad &quad, const RenderSurface &rs);
     };
     
 } // namespace rg

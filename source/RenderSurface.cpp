@@ -1,6 +1,5 @@
 #include <RG/RenderSurface.h>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <RG/RGraph.h>
 #include <RG/r_util.h>
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -104,12 +103,15 @@ bool RenderSurface::activate() const
         return false;
     
     glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
+    glViewport(0,0,m_size.x, m_size.y);
     return true;    
 }
 
 void RenderSurface::deactivate()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    auto scr_size = RGraph::getInstancePtr()->getDefaultWindow()->getSize();
+    glViewport(0,0, scr_size.x, scr_size.y);
 }
 
 void RenderSurface::clear()

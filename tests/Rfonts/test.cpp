@@ -1,6 +1,7 @@
 #include <RG/RGraph.h>
 #include <RG/Font.h>
 #include <RG/Drawer.h>
+#include <RG/QuadDrawer.h>
 
 #include <RG/Shader.h>
 #include <RG/File.h>
@@ -14,27 +15,22 @@ int main()
 	rg::Font f;
 	f.loadFont("fonts/arial.ttf");
 
-	rg::Texture t(f.tex, glm::vec2(800.f, 600.f), 4);
+	rg::Quad q;
+	rg::QuadDrawer qd;
 
-	rg::Sprite q;
-	q.setPosition(glm::vec2(100,100));
-	q.setTexture(t);
-
+	rg::Sprite s;
+	s.setPosition(glm::vec2(0,100));
+	s.setTexture(f.m_texture);
 
 	auto win = rgraph.getDefaultWindow();
 	rg::Drawer dr;
 	win->setClearColor(rg::Color::Blue);
-
-
     while (win->windowOpen())
     {
         win->clearScreen();
-		//f.drawText("abcggggg");
-		dr.draw(q);
+		dr.draw(s);
         win->updateScreen();
     }
 	
-	int i;
-	scanf("%d", &i);
 	return 0;
 }

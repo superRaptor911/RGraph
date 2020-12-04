@@ -5,6 +5,7 @@
 #include <RG/Ref_Base.h>
 #include <glm/glm.hpp>
 #include <RG/Shader.h>
+#include <RG/Texture.h>
 
 namespace rg
 {
@@ -20,7 +21,7 @@ namespace rg
 			long offset = 0;
 		};
 
-		int m_size = 12;
+		int m_size = 24;
 		std::map<char, Character> m_characters;
 
 		Shader shader;
@@ -28,11 +29,11 @@ namespace rg
 		
 	public:
 
-		uint tex;
+		Texture m_texture;
 
 	private:
 			 
-		inline void m_decrementRefCount();
+		inline void m_detachRef();
 		// Free Glyphs
 		void m_freeGlyphs();
 		
@@ -46,8 +47,8 @@ namespace rg
 		
 		bool loadFont(const std::string &path);
 		
-		void drawText(const std::string &str);
-		
+        // Destroy Font
+        void destroy();
 	};
 }
 

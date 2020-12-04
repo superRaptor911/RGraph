@@ -56,12 +56,17 @@ bool RGraph::InitRgraph()
     #endif
 
     glfwSetErrorCallback(m_error_callback);
-    glEnable(GL_DEPTH_TEST);
-
     m_default_window.createWindow(glm::ivec2(1024, 768), "Rgraph");
     m_current_window = &m_default_window;
     RGraph_initiated_signal.emit();
     m_is_initiated = true;
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
+
     return true;
 }
 

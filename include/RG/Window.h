@@ -36,12 +36,14 @@ namespace rg
         Window() {};
         bool createWindow(const glm::ivec2 &window_size, const std::string &title);
         void setAsCurrent();
-
+        
         void setClearColor(const Color &c);
         Color getClearColor() const;
         void clearScreen();
         void updateScreen();
         bool windowOpen();
+
+        glm::ivec2 getSize() { return m_size;}
 
         glm::mat4 getOrthoProjection() { return m_ortho_projection;}
         GLFWwindow *getGLFWWindow();

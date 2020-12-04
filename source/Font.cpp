@@ -1,11 +1,9 @@
 #include <RG/r_util.h>
 #include <RG/Font.h>
-#include <RG/File.h>
 #include <RG/RGraph.h>
-#include <ft2build.h>
-#include <RG/Quad.h>
 #include <RG/QuadDrawer.h>
 #include <RG/RenderSurface.h>
+#include <ft2build.h>
 #include FT_FREETYPE_H
 
 
@@ -37,7 +35,7 @@ Font::Font(Font &f)
 Font &Font::operator = (Font &f)
 {
     // Decrement ref count and delete Texture if ref vount reaches 0
-    m_decrementRefCount();
+    m_detachRef();
     // Do ref counting
     attachRefCount(f);
 
@@ -53,8 +51,7 @@ bool Font::loadFont(const std::string &path)
 	// Handle previously loaded font
 	if (!m_characters.empty())
 	{
-		m_decrementRefCount();
-		startRefCounting();
+		destroy();
 	}
 	
 	// Free Type resource
@@ -76,18 +73,17 @@ bool Font::loadFont(const std::string &path)
 		return false;
 	}
 	
-	FT_Set_Pixel_Sizes(face, 0, 48);
-	// Disable byte-alignment restriction
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
+	// Set Size
+	FT_Set_Pixel_Sizes(face, 0, m_size);
+	// Load glyphs
 	long f_offset = 0;
-	  
+	int max_bearing = 0;
 	for (unsigned char c = 0; c < 128; c++)
 	{
 		// load character glyph 
 		if (FT_Load_Char(face, c, FT_LOAD_RENDER))
 		{
-			R_CPRINT_WARN("Failed to load Glyph");
+			R_CPRINT_WARN("Failed to load Glyph ");
 			continue;
 		}
 		
@@ -121,17 +117,29 @@ bool Font::loadFont(const std::string &path)
 		};
 		f_offset += character.Advance;
 		m_characters.insert(std::pair<char, Character>(c, character));
+
+		if (max_bearing < face->glyph->bitmap_top)
+		{
+			max_bearing = face->glyph->bitmap_top;
+		}
 	}
 	
 	// Cleanup FT
 	FT_Done_Face(face);
 	FT_Done_FreeType(ft);
 
-	rg::File vs, fs;
-	vs.open("shaders/s1.vs");
-	fs.open("shaders/s1.fs");
+	if (m_characters.empty())
+	{
+		R_CPRINT_ERR("Unable to generate any glyps for Font.");
+		return false;
+	}
 	
-	shader = rg::Shader(vs.getFileContent(), fs.getFileContent());
+	// Shader source
+	const char *vs_src = "#version 330 core \n layout (location = 0) in vec2 vertex; out vec2 TexCoords;  uniform mat4 proj; uniform mat4 model;  void main() {     gl_Position = proj * model * vec4(vertex.xy, 0.0, 1.0);     TexCoords = vertex.xy; }";
+	const char *fs_src = "#version 330 core \n in vec2 TexCoords; out vec4 color;  uniform sampler2D text; uniform vec3 textColor;  void main() {         vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);     color = vec4(textColor, 1.0) * sampled; }";
+	
+	// Create Shader
+	shader = rg::Shader(vs_src, fs_src);
 
 	const float Vertex_data[8] = {
 	// positions and texture coords
@@ -145,10 +153,6 @@ bool Font::loadFont(const std::string &path)
 		0, 1, 2, // first triangle
 		2, 3, 0  // second triangle
 	};
-
-    // glEnable(GL_CULL_FACE);
-    // glEnable(GL_BLEND);
-    // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
 	int vertex_size = sizeof(float) * 2;
 	
@@ -169,102 +173,56 @@ bool Font::loadFont(const std::string &path)
 
     glBindVertexArray(0);
 
-	/////////////////////////////////////////////////////////////
-
-	RenderSurface rs(800, 600);
+	// Create Surface
+	auto last_ch = (--m_characters.end())->second;
+	RenderSurface rs(last_ch.offset + last_ch.Bearing.x, m_size);
 	rs.activate();
-
-	shader.setParam("textColor", glm::vec3(0.5f, 0.8f, 0.2f));
+	rs.setClearColor(Color(0.0f,0.0f,0.0f,0.0f));
+	rs.clear();
+	shader.setParam("textColor", glm::vec3(0.0f, 0.0f, 0.0f));
 	shader.setParam("proj", rs.getOrthoProjection());
-	shader.activate();
-
-	Quad q;
-	QuadDrawer qd;
-
-	q.setPosition(glm::vec2(10,10));
-	q.setSize(glm::vec2(100,100));
-	q.setColor(Color::Blue);
-	qd.drawQuad(q);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
-
-
-	return true;
+	shader.activate();	
 
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(m_VAO);
 
-	Character chr = m_characters[uchar(65)];
-	long index = chr.offset;
-	for (uchar c = 65; c < 70; c++)
+	for (uchar c = 0; c < 128; c++)
 	{
         Character ch = m_characters[c];
 
-        float xpos = ch.offset - index + ch.Bearing.x;
-        float ypos = 40-ch.Bearing.y;
+        float xpos = ch.offset + ch.Bearing.x;
+        float ypos = max_bearing - ch.Bearing.y;
         float w = ch.Size.x;
         float h = ch.Size.y;
 
-		printf("pos : (%f, %f) | sz : (%f, %f)\n", xpos, ypos, w, h);
-
+		Quad q;
 		q.setPosition(glm::vec2(xpos,ypos));
 		q.setSize(glm::vec2(w, h));
-		//q.setScale(glm::vec2(1,-1));
 		shader.setParam("model", q.getTransformMatrix());
 
         // render glyph texture over quad
         glBindTexture(GL_TEXTURE_2D, ch.TextureID);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);		
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);	
 	}
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(0,0,1024,768);
-	// tex = texColorBuffer;
+	// Cleanup
+	glBindVertexArray(0);
+	glDeleteBuffers(1, &m_VBO);
+	glDeleteBuffers(1, &m_EBO);
+	glDeleteVertexArrays(1, &m_VAO);
 
+	for (auto &i : m_characters)
+	{
+		glDeleteTextures(1, &i.second.TextureID);
+	}
+
+	rs.deactivate();
+	m_texture = rs.getTexture();
 	return true;
 }
 
 
-void Font::drawText(const std::string &str)
-{
-    float x=100, y=100;
-	//glm::ortho(0.0f, 1024.f, 0.0f, 768.f);
-	shader.setParam("textColor", glm::vec3(0.5f, 0.8f, 0.2f));
-	shader.setParam("proj", RGraph::getInstancePtr()->getDefaultWindow()->getOrthoProjection());
-	shader.activate();
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindVertexArray(m_VAO);
-
-	Quad q;
-    // iterate through all characters
-    std::string::const_iterator c;
-    for (c = str.begin(); c != str.end(); c++) 
-    {
-        Character ch = m_characters[*c];
-
-        float xpos = x + ch.Bearing.x;
-        float ypos = y - ch.Bearing.y;
-        float w = ch.Size.x;
-        float h = ch.Size.y;
-
-		q.setPosition(glm::vec2(xpos,ypos));
-		q.setSize(glm::vec2(w, h));
-		//q.setScale(glm::vec2(1,-1));
-		shader.setParam("model", q.getTransformMatrix());
-
-        // render glyph texture over quad
-        glBindTexture(GL_TEXTURE_2D, ch.TextureID);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-        // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
-        x += (ch.Advance >> 6); // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
-    }
-    glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-}
-
-
-void Font::m_decrementRefCount()
+void Font::m_detachRef()
 {
     // Delete resource if value of ref count reaches 0
     if (dettachRefCount())
@@ -272,18 +230,15 @@ void Font::m_decrementRefCount()
         // Destroy glyphs
 		if (!m_characters.empty())
 		{
-			// code to free glyphs
-			m_freeGlyphs();
+			m_characters.clear();
+			m_texture.destroy();
 		}
     }
 }
 
-void Font::m_freeGlyphs()
-{
-	for (auto &i : m_characters)
-	{
-		glDeleteTextures(1, &i.second.TextureID);
-	}
 
-	m_characters.clear();
+void Font::destroy()
+{
+	m_detachRef();
+	startRefCounting();
 }

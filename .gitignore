@@ -5,3 +5,4 @@ doc/
 *.so
 *.a
 *.pdf
+.cache/

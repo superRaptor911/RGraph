@@ -11,7 +11,6 @@ QuadBatcher::QuadBatcher()
                                 "layout (location = 2) in mat4 instanceMatrix;\n"
 
                                 "out vec4 clr;\n"
-
                                 "uniform mat4 proj;\n"
 
                                 "void main()\n"
@@ -31,10 +30,7 @@ QuadBatcher::QuadBatcher()
                                 "}\n";
     
 
-    m_shader.addVertexShaderSource(vertex_source);
-    m_shader.addFragmentShaderSource(frag_source);
-    m_shader.createShader();
-
+    m_shader.createShader(vertex_source, frag_source);
     int size_of_vertex = sizeof(float) * (2); // 2 floats for pos
 
     glGenVertexArrays(1, &m_VAO);
@@ -96,15 +92,53 @@ void QuadBatcher::draw(std::vector<Quad> &quads)
         id++;
     }
 
+    // Number of batches
     int batch_count = (quad_count - 1) / m_Max_Units + 1;
     int quads_remaining = quad_count;
 
     m_shader.activate();
     m_shader.setParam("proj",  RGraph::getInstancePtr()->getDefaultWindow()->getOrthoProjection());
     
-    // Activate default framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    for (int i = 0; i < batch_count; i++)
+    {
+        int count = std::min(m_Max_Units, quads_remaining);
+        quads_remaining -= count;
 
+        // Transform buffer
+        glBindBuffer(GL_ARRAY_BUFFER, m_trans_buffer);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(glm::mat4), &transforms[i * m_Max_Units]);
+        
+        // Color buffer
+        glBindBuffer(GL_ARRAY_BUFFER, m_color_buffer);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(glm::vec4), &colors[i * m_Max_Units]);
+        
+        glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, count);
+    }
+}
+
+
+void QuadBatcher::draw(std::vector<Quad> &quads, const glm::mat4 &surfaceTransform)
+{
+    int quad_count = quads.size();
+    std::vector<glm::mat4> transforms(quad_count);
+    std::vector<glm::vec4> colors(quad_count);
+
+    int id = 0;
+    for (auto &i : quads)
+    {
+        transforms[id] = i.getTransformMatrix();
+        auto color = i.getColor();
+        colors[id] = glm::vec4(color.r, color.g, color.b, color.a);
+        id++;
+    }
+
+    // Number of batches
+    int batch_count = (quad_count - 1) / m_Max_Units + 1;
+    int quads_remaining = quad_count;
+
+    m_shader.activate();
+    m_shader.setParam("proj", surfaceTransform);
+    
     for (int i = 0; i < batch_count; i++)
     {
         int count = std::min(m_Max_Units, quads_remaining);

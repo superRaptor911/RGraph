@@ -1,6 +1,7 @@
 #ifndef QUAD_DRAWER_H
 #define QUAD_DRAWER_H
 
+#include "glm/fwd.hpp"
 #include <RG/Global_Def.h>
 #include <RG/Quad.h>
 #include <RG/Shader.h>
@@ -21,6 +22,10 @@ namespace rg
         QuadDrawer();
         void drawQuad(Quad &quad);
         void drawQuad(Quad &quad, const RenderSurface &rs);
+        void drawQuad(Quad &quad, const glm::mat4 &surfaceTransform);
+        void drawQuad(Quad &quad, const glm::mat4 &surfaceTransform, Shader &shader);
+
+
     };
     
 } // namespace rg

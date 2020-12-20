@@ -34,7 +34,9 @@ namespace rg
     public:
 
         RenderSurface();
+	// Create surface with given dimension
         RenderSurface(const glm::ivec2 &size);
+	// Create surface with given dimension
         RenderSurface(uint x_sz, uint y_sz);
 
         // Cpy constructor

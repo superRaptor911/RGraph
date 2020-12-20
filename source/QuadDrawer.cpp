@@ -1,7 +1,7 @@
 #include <RG/RGraph.h>
 #include <RG/QuadDrawer.h>
 #include <RG/Window.h>
-
+#include <RG/r_util.h>
 using namespace rg;
 
 
@@ -42,28 +42,26 @@ QuadDrawer::QuadDrawer()
 
 
     std::string vertex_source = "#version 420 core\n"
-                                "layout (location = 0) in vec2 vpos;\n"
+	"layout (location = 0) in vec2 vpos;\n"
+	"uniform mat4 proj;\n"
+	"uniform mat4 model;\n"
+	"void main()\n"
+	"{\n"
+	"gl_Position = proj * model * vec4(vpos, 0.0, 1.0);\n"
+	"}\n";
 
-                                "uniform mat4 proj;\n"
-                                "uniform mat4 model;\n"
-
-                                "void main()\n"
-                                "{\n"
-                                " gl_Position = proj * model * vec4(vpos, 0.0, 1.0);\n"
-                                "}\n";
-    
     std::string frag_source = "#version 420 core\n"
-                            "out vec4 FragColor;\n"
-                            "uniform vec4 color;\n"
+	"out vec4 FragColor;\n"
+	"uniform vec4 color;\n"
+	"void main()\n"
+	"{\n"
+	"FragColor = color;\n"
+	"}\n";
 
-                            "void main()\n"
-                            "{\n"
-                            "	FragColor = color;\n"
-                            "}\n";
-    
-    m_shader.addVertexShaderSource(vertex_source);
-    m_shader.addFragmentShaderSource(frag_source);
-    m_shader.createShader();// = Shader(vertex_source, frag_source);
+    if (!m_shader.createShader(vertex_source, frag_source))   
+    {
+	R_CPRINT_ERR("Quad shader creation failed.");
+    }
 }
 
 void QuadDrawer::drawQuad(Quad &quad)
@@ -92,4 +90,23 @@ void QuadDrawer::drawQuad(Quad &quad, const RenderSurface &rs)
     glBindVertexArray(m_VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);   
+}
+
+
+void QuadDrawer::drawQuad(Quad &quad, const glm::mat4 &surfaceTransform)
+{
+    m_shader.activate();
+    m_shader.setParam("proj", surfaceTransform);
+    m_shader.setParam("model", quad.getTransformMatrix());
+    m_shader.setParam("color", quad.m_color);
+
+    glBindVertexArray(m_VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
+
+
+void QuadDrawer::drawQuad(Quad &quad, const glm::mat4 &surfaceTransform, Shader &shader)
+{
+    // Next Time
 }

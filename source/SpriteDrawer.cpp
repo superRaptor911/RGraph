@@ -63,9 +63,7 @@ SpriteDrawer::SpriteDrawer()
                             "	FragColor = texture(tex, uv) * color;\n"
                             "}\n";
     
-    m_shader.addVertexShaderSource(vertex_source);
-    m_shader.addFragmentShaderSource(frag_source);
-    m_shader.createShader();// = Shader(vertex_source, frag_source);
+    m_shader.createShader(vertex_source, frag_source);// = Shader(vertex_source, frag_source);
 }
 
 

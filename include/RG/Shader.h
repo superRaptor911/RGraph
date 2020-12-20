@@ -22,7 +22,8 @@ namespace rg
 
         inline int m_getUniformLocation(const std::string &param);
         inline void m_decrementRefCount();
-        bool m_chkError(uint &id, const std::string &type);
+        bool m_chkShaderError(uint &id);
+	bool m_chkProgramError(uint &id);
     
 
     public:
@@ -32,9 +33,7 @@ namespace rg
 
         Shader &operator = (const Shader &shader);
 
-        bool addVertexShaderSource(const std::string &source);
-        bool addFragmentShaderSource(const std::string &source);
-        bool createShader();
+        bool createShader(const std::string &vert_src, const std::string &frag_src);
 
         void setParam(const std::string &param, int val);
         void setParam(const std::string &param, float val);
@@ -44,7 +43,6 @@ namespace rg
         void setParam(const std::string &param, const glm::mat4 &val);
         void setParam(const std::string &param, const Color &val);
 
-        bool isReady() { return m_shader_program != RG_INVALID_ID;}
         void activate();
 
         ~Shader();

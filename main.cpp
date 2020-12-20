@@ -1,6 +1,6 @@
 #include <RG/RGraph.h>
 #include <RG/r_util.h>
-#include <RG/Drawer.h>
+#include <RG/QuadDrawer.h>
 #include <RG/File.h>
 
 int main()
@@ -15,12 +15,12 @@ int main()
  
     rg::Window *w = RG.getDefaultWindow();
     w->setClearColor(rg::Color::Blue);
-    rg::Drawer drawer;
+    rg::QuadDrawer drawer;
 
     while (w->windowOpen())
     {
         w->clearScreen();       
-        drawer.draw(quad);
+        drawer.drawQuad(quad);
         w->updateScreen();
     }
     

@@ -25,8 +25,8 @@ Shader::Shader(const std::string &vert_src, const std::string &frag_src)
 {
     startRefCounting();
 
-    if (addVertexShaderSource(vert_src) && addFragmentShaderSource(frag_src))
-        createShader();
+    if (!createShader(vert_src, frag_src))
+        printf("Error : Failed to create shader\n");
 }
 
 Shader &Shader::operator = (const Shader &shader)
@@ -42,7 +42,7 @@ Shader &Shader::operator = (const Shader &shader)
     return *this; 
 }
 
-bool Shader::m_chkError(uint &id, const std::string &type)
+bool Shader::m_chkShaderError(uint &id)
 {
     GLint success;
     GLchar infoLog[1024];
@@ -51,60 +51,66 @@ bool Shader::m_chkError(uint &id, const std::string &type)
     if(!success)
     {
         glGetShaderInfoLog(id, 1024, NULL, infoLog);
-        printf("ERROR:: %s shader.\n%s----------------\n", type.c_str() ,infoLog);
-
-        if (type == "Linking")
-            glDeleteProgram(id);
-        else
-            glDeleteShader(id);
-        
+        printf("SHADER-ERROR::\n%s \n", infoLog);
         id = RG_INVALID_ID;
+	return false;
     } 
 
-    return success;
+    return true;
 }
 
-bool Shader::addVertexShaderSource(const std::string &source)
+bool Shader::m_chkProgramError(uint &id)
 {
-    // Delete shader if already exists
-    if (m_vertex_shader != RG_INVALID_ID)
-        glDeleteShader(m_vertex_shader);
-    
-    const char* src = source.c_str();
-    // create new shader
-    m_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(m_vertex_shader, 1, &src, nullptr);
-    glCompileShader(m_vertex_shader);
-    return m_chkError(m_vertex_shader, "Vertex");
+    GLint status;
+    glGetProgramiv (id, GL_LINK_STATUS, &status);
+
+    if (!status)
+    {
+        GLint infoLogLength;
+        glGetProgramiv(id, GL_INFO_LOG_LENGTH, &infoLogLength);
+        
+        GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+        glGetProgramInfoLog(id, infoLogLength, NULL, strInfoLog);
+        fprintf(stderr, "Linker failure: %s\n", strInfoLog);
+        delete[] strInfoLog;
+	return false;
+    }
+    return true;
 }
 
-bool Shader::addFragmentShaderSource(const std::string &source)
- {
-    // Delete shader if already exists
-    if (m_fragment_shader != RG_INVALID_ID)
-        glDeleteShader(m_fragment_shader);
 
-    const char* src = source.c_str();
-    m_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(m_fragment_shader, 1, &src, nullptr);
-    glCompileShader(m_fragment_shader);
-
-    return m_chkError(m_fragment_shader, "Fragment");
- }
-
-bool Shader::createShader()
+bool Shader::createShader(const std::string &vert_src, const std::string &frag_src)
 {
     // Delete program if already exists
     if (m_shader_program != RG_INVALID_ID)
         glDeleteProgram(m_shader_program);
 
-    m_shader_program = glCreateProgram();
+    const char *v_src = vert_src.c_str();
+    m_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(m_vertex_shader, 1, &v_src, nullptr);
+    glCompileShader(m_vertex_shader);
+    if (!m_chkShaderError(m_vertex_shader))
+    {
+	printf("Error: Failed to compile vertex shader.\n");
+	return false;
+    }
 
+    const char* f_src = frag_src.c_str();
+    m_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(m_fragment_shader, 1, &f_src, nullptr);
+    glCompileShader(m_fragment_shader);
+    if (!m_chkShaderError(m_fragment_shader))
+    {
+	printf("Error: Failed to compile fragment shader.\n");
+	return false;
+    }
+    
+    m_shader_program = glCreateProgram();
     glAttachShader(m_shader_program, m_vertex_shader);
     glAttachShader(m_shader_program, m_fragment_shader);
     glLinkProgram(m_shader_program);
 
-    return m_chkError(m_shader_program, "Linking");
+    return m_chkProgramError(m_shader_program);
 }
 
 int Shader::m_getUniformLocation(const std::string &param)

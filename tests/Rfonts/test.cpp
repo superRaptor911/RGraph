@@ -8,29 +8,29 @@
 
 int main()
 {	
-	rg::RGraph rgraph;
-	rgraph.InitRgraph();
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	
-	rg::Font f;
-	f.loadFont("fonts/arial.ttf");
+    rg::RGraph rgraph;
+    rgraph.InitRgraph();
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-	rg::Quad q;
-	rg::QuadDrawer qd;
+    rg::Font f;
+    f.loadFont("fonts/arial.ttf");
 
-	rg::Sprite s;
-	s.setPosition(glm::vec2(0,100));
-	s.setTexture(f.m_texture);
+    rg::Quad q;
+    rg::QuadDrawer qd;
 
-	auto win = rgraph.getDefaultWindow();
-	rg::Drawer dr;
-	win->setClearColor(rg::Color::Blue);
+    rg::Sprite s;
+    s.setPosition(glm::vec2(0,100));
+    s.setTexture(f.m_texture);
+
+    auto win = rgraph.getDefaultWindow();
+    rg::Drawer dr;
+    win->setClearColor(rg::Color::Blue);
     while (win->windowOpen())
     {
-        win->clearScreen();
-		dr.draw(s);
-        win->updateScreen();
+	win->clearScreen();
+	dr.draw(s);
+	win->updateScreen();
     }
-	
-	return 0;
+
+    return 0;
 }

@@ -11,8 +11,10 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(CMAKE_CXX_FLAGS "-Wall -std=c++1z -lstdc++fs")
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# External deps
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/glfw)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/deps/freetype)
+# Testing dir
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 

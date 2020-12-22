@@ -6,10 +6,8 @@
 
 using namespace rg;
 
-SpriteBatcher::SpriteBatcher(Window *window)
+SpriteBatcher::SpriteBatcher()
 {
-    m_window = window;
-
     const char *vertex_source420 = "#version 420 core\n"
                                 "layout (location = 0) in vec2 vpos;\n"
                                 "layout (location = 1) in vec4 instanceColor;\n"
@@ -18,6 +16,7 @@ SpriteBatcher::SpriteBatcher(Window *window)
 
                                 "out vec4 clr;\n"
                                 "out float tex_id;\n"
+                                "out vec2 uv;\n"
 
                                 "uniform mat4 proj;\n"
 
@@ -26,13 +25,16 @@ SpriteBatcher::SpriteBatcher(Window *window)
                                     " gl_Position = proj * instanceMatrix * vec4(vpos, 0.0, 1.0);\n"
                                     "clr = instanceColor;\n"
                                     "tex_id = texID;\n"
+				    "uv = vpos;\n"
                                 "}\n";
     
     const char *frag_source420  = "#version 420 core\n"
                                 "out vec4 FragColor;\n"
 
                                 "in vec4 clr;\n"
+                                "in vec2 uv;\n"
                                 "in float tex_id;\n"
+
                                 "uniform sampler2D textures[%d];\n"
 
                                 "void main()\n"

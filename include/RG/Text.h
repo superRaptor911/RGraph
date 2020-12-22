@@ -1,8 +1,10 @@
 #ifndef TEXT_H
 #define TEXT_H
 
+#include "glm/fwd.hpp"
 #include <RG/RenderSurface.h>
 #include <RG/Font.h>
+#include <string>
 
 namespace rg
 {
@@ -11,15 +13,23 @@ namespace rg
 	Font m_font;
 	RenderSurface m_ren_surf;
 	std::string m_text;
+	int m_vertical_seperation = 4;
 
     public:
 
-	Text();
+	Text(){;}
 	Text(const std::string &txt);
-
-	void setFont(const Font &f);
+	
+	// Set Text, ASCII only
+	void setText(const std::string &txt);
+	// Set Font to render
+	void setFont(Font &f);
+	// Get currently used font
 	Font getFont();
-	void draw();
+
+	void setVSeperation(int v_sep);
+	// Draw Text
+	void draw(const glm::vec2 &pos);
 
     };
 }

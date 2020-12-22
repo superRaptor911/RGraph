@@ -22,6 +22,7 @@ namespace rg
 	};
 
 	uint m_size = 10;
+	int m_max_bearing = 0;
 
 	Shader shader;
 	uint m_VAO, m_VBO, m_EBO;
@@ -46,6 +47,8 @@ namespace rg
 	Font &operator = (Font &f);
 
 	bool loadFont(const std::string &path, uint font_size = 14);
+	uint getSize() { return m_size; }
+	int getMaxBearingY() { return m_max_bearing; }
 
 	// Destroy Font
 	void destroy();

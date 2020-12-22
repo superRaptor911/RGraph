@@ -30,6 +30,7 @@ Font::Font(Font &f)
     // get data from f
     m_characters = f.m_characters;
     m_size = f.m_size;
+    m_max_bearing = f.m_max_bearing;
 }
 
 Font &Font::operator = (Font &f)
@@ -42,6 +43,7 @@ Font &Font::operator = (Font &f)
     // get data from f
     m_characters = f.m_characters;
     m_size = f.m_size;
+    m_max_bearing = f.m_max_bearing;
 
     return *this;
 }
@@ -79,7 +81,7 @@ bool Font::loadFont(const std::string &path, uint font_size)
     FT_Set_Pixel_Sizes(face, 0, m_size);
     // Load glyphs
     long f_offset = 0;	// Offset of character in texture
-    int max_bearing = 0;
+    m_max_bearing = 0;
     for (unsigned char c = 0; c < 128; c++)
     {
 	// load character glyph 
@@ -120,9 +122,9 @@ bool Font::loadFont(const std::string &path, uint font_size)
 	f_offset += character.Advance;
 	m_characters.insert(std::pair<char, Character>(c, character));
 
-	if (max_bearing < face->glyph->bitmap_top)
+	if (m_max_bearing < face->glyph->bitmap_top)
 	{
-	    max_bearing = face->glyph->bitmap_top;
+	    m_max_bearing = face->glyph->bitmap_top;
 	}
     }
 
@@ -211,7 +213,7 @@ bool Font::loadFont(const std::string &path, uint font_size)
 	Character ch = m_characters[c];
 
 	float xpos = ch.offset + ch.Bearing.x;
-	float ypos = max_bearing - ch.Bearing.y;
+	float ypos = m_max_bearing - ch.Bearing.y;
 	float w = ch.Size.x;
 	float h = ch.Size.y;
 

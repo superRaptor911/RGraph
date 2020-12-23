@@ -14,11 +14,12 @@ namespace rg
 	RenderSurface m_ren_surf;
 	std::string m_text;
 	int m_vertical_seperation = 4;
+	Color m_color;
+	Shader m_shader;
 
     public:
 
-	Text(){;}
-	Text(const std::string &txt);
+	Text();
 	
 	// Set Text, ASCII only
 	void setText(const std::string &txt);

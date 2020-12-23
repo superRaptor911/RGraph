@@ -28,20 +28,10 @@ void Drawer::draw(Quad &quad)
     m_quad_drawer->drawQuad(quad);
 }
 
-void Drawer::draw(Quad &quad, const RenderSurface &rs)
-{
-    m_quad_drawer->drawQuad(quad, rs);
-}
-
 
 void Drawer::draw(Sprite &sprite)
 {
     m_sprite_drawer->drawSprite(sprite);
-}
-
-void Drawer::draw(Sprite &sprite, const RenderSurface &rs)
-{
-    m_sprite_drawer->drawSprite(sprite, rs);
 }
 
 

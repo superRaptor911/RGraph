@@ -1,6 +1,7 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
+#include "glm/fwd.hpp"
 #include <glm/glm.hpp>
 #include <string>
 #include <RG/Ref_Base.h>
@@ -11,12 +12,18 @@ namespace rg
     class Texture : public Ref_Base
     {     
     private:
-        // Handle to texture
-        uint m_texture_id = RG_INVALID_ID;
-        // Texture size 
-        glm::ivec2 m_size;
-        // channels, 4 for rgba
-        int m_channels = RG_INVALID_ID;
+	
+	struct Data
+	{
+	    // Handle to texture
+	    uint m_texture_id = RG_INVALID_ID;
+	    // Texture size 
+	    glm::ivec2 m_size = glm::ivec2(0, 0);
+	    // channels, 4 for rgba
+	    int m_channels = RG_INVALID_ID;
+	};
+
+	Data m_data;
 
     private:
 
@@ -50,7 +57,9 @@ namespace rg
         void activate(int id = 0);
         
         // Get opengl texture id
-        uint getTextureID() { return m_texture_id;}
+        uint getTextureID() { return m_data.m_texture_id;}
+
+	int getChannels() { return m_data.m_channels; }
 
         Image getImage();
 

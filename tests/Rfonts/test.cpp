@@ -1,7 +1,9 @@
+#include "RG/Sprite.h"
+#include "RG/Texture.h"
 #include "glm/fwd.hpp"
 #include <RG/RGraph.h>
 #include <RG/Drawer.h>
-#include <RG/QuadDrawer.h>
+#include <RG/SpriteDrawer.h>
 #include <RG/Text.h>
 
 int main()
@@ -11,18 +13,16 @@ int main()
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
     rg::Font f;
-    f.loadFont("fonts/arial.ttf");
+    f.loadFont("fonts/arial.ttf", 24);
 
-    rg::Quad q;
-    rg::QuadDrawer qd;
-
-    rg::Sprite s;
-    s.setPosition(glm::vec2(0,100));
-    s.setTexture(f.m_texture);
+    rg::Texture texture("textures/m1.png");
+    rg::Sprite spr;
+    spr.setTexture(texture);
+    rg::SpriteDrawer spr_dr;
 
     rg::Text text;
     text.setFont(f);
-    text.setText("This____\n\n_lThis_\n___Thast");
+    text.setText("This is great?.\n Haha Jett is the best");
 
     auto win = rgraph.getDefaultWindow();
     rg::Drawer dr;
@@ -30,8 +30,8 @@ int main()
     while (win->windowOpen())
     {
 	win->clearScreen();
-	dr.draw(s);
 	text.draw(glm::vec2(100,300));
+//	spr_dr.drawSprite(spr);
 	win->updateScreen();
     }
 

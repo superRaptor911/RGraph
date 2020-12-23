@@ -14,11 +14,10 @@ namespace rg
 	// Struct
 	struct Character 
 	{
-	    uint TextureID;  		// ID handle of the glyph texture
+	    Texture texture;  		// Texture of character
 	    glm::ivec2   Size;		// Size of glyph
 	    glm::ivec2   Bearing;	// Offset from baseline to left/top of glyph
 	    long Advance;    		// Offset to advance to next glyph
-	    long offset = 0;
 	};
 
 	uint m_size = 10;
@@ -29,7 +28,6 @@ namespace rg
 
     public:
 
-	Texture m_texture;
 	std::map<char, Character> m_characters;
 
     private:

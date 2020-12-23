@@ -209,6 +209,9 @@ void Shader::m_decrementRefCount()
         if (m_shader_program != RG_INVALID_ID)
             glDeleteProgram(m_shader_program);
     }
+    m_fragment_shader = RG_INVALID_ID; 
+    m_vertex_shader = RG_INVALID_ID; 
+    m_fragment_shader = RG_INVALID_ID; 
 }
 
 void Shader::activate()

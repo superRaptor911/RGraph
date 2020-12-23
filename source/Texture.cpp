@@ -25,19 +25,16 @@ Texture::Texture(const Texture &T)
 {
     // Do ref counting
     attachRefCount(T);
-    // copy Texture id
-    m_texture_id = T.m_texture_id;
-    //Copy size
-    m_size = T.m_size;
+    m_data = T.m_data;
 }
 
 Texture::Texture(uint gl_Texture, const glm::vec2 &sz,int channels)
 {
     // Start Reference counting
     startRefCounting();
-    m_texture_id = gl_Texture;
-    m_channels = channels;
-    m_size = sz;
+    m_data.m_texture_id = gl_Texture;
+    m_data.m_channels = channels;
+    m_data.m_size = sz;
 }
 
 Texture &Texture::operator = (const Texture &T)
@@ -46,38 +43,33 @@ Texture &Texture::operator = (const Texture &T)
     m_detachRef();
     // Do ref counting
     attachRefCount(T);
-
-    // copy Texture id
-    m_texture_id = T.m_texture_id;
-    //Copy size
-    m_size = T.m_size;
-
+    m_data = T.m_data;
     return *this;
 }
 
 bool Texture::operator == (const Texture &T)
 {
-    return (m_texture_id == T.m_texture_id);
+    return (m_data.m_texture_id == T.m_data.m_texture_id);
 }
 
 bool Texture::loadTexture(const std::string &path)
 {
 
     stbi_set_flip_vertically_on_load(true); 
-    uchar *data = stbi_load(path.c_str(), &m_size.x, &m_size.y, &m_channels, 0);
+    uchar *data = stbi_load(path.c_str(), &m_data.m_size.x, &m_data.m_size.y, &m_data.m_channels, 0);
 
     // Destroy active Texture active
-    if (m_texture_id != RG_INVALID_ID)
+    if (m_data.m_texture_id != RG_INVALID_ID)
     {
         destroy();
 	}
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glGenTextures(1, &m_texture_id);
+    glGenTextures(1, &m_data.m_texture_id);
     
     // Set as nth Texture
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_texture_id);
+    glBindTexture(GL_TEXTURE_2D, m_data.m_texture_id);
     // set the texture wrapping/filtering options (on the currently bound texture object)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -89,7 +81,7 @@ bool Texture::loadTexture(const std::string &path)
     {
         // Color format (Default RGB)
         auto clr_format = GL_RGBA;
-        switch (m_channels)
+        switch (m_data.m_channels)
         {
         case 3:
             clr_format = GL_RGB;
@@ -101,7 +93,7 @@ bool Texture::loadTexture(const std::string &path)
             break;
         }
                 
-        glTexImage2D(GL_TEXTURE_2D, 0, clr_format, m_size.x, m_size.y, 0, clr_format, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, clr_format, m_data.m_size.x, m_data.m_size.y, 0, clr_format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
@@ -117,13 +109,13 @@ bool Texture::loadTexture(const std::string &path)
 
 glm::ivec2 Texture::getSize() const
 {
-    return m_size;
+    return m_data.m_size;
 }
 
 void Texture::activate(int id)
 {
     glActiveTexture(GL_TEXTURE0 + id);
-    glBindTexture(GL_TEXTURE_2D, m_texture_id);
+    glBindTexture(GL_TEXTURE_2D, m_data.m_texture_id);
 }
 
 void Texture::m_detachRef()
@@ -132,22 +124,22 @@ void Texture::m_detachRef()
     if (dettachRefCount())
     {
         // Destroy Texture if exists
-        if (m_texture_id != RG_INVALID_ID)
-            glDeleteTextures(1, &m_texture_id);
+        if (m_data.m_texture_id != RG_INVALID_ID)
+            glDeleteTextures(1, &m_data.m_texture_id);
     }
 
-    m_texture_id = RG_INVALID_ID;
+    m_data.m_texture_id = RG_INVALID_ID;
 }
 
 Image Texture::getImage()
 {
-    if (m_texture_id == RG_INVALID_ID)
+    if (m_data.m_texture_id == RG_INVALID_ID)
         return Image();
     
-    uchar* data = new uchar[m_size.x * m_size.y * m_channels];
+    uchar* data = new uchar[m_data.m_size.x * m_data.m_size.y * m_data.m_channels];
 
     auto clr_format = GL_RGBA;
-    switch (m_channels)
+    switch (m_data.m_channels)
     {
     case 3:
         clr_format = GL_RGB;
@@ -160,7 +152,7 @@ Image Texture::getImage()
     }
 
     glGetTexImage(GL_TEXTURE_2D, 0, clr_format, GL_UNSIGNED_BYTE, data);
-    return Image(data, m_size, m_channels);
+    return Image(data, m_data.m_size, m_data.m_channels);
 }
 
 // Detach previous ref and create new

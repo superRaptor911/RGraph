@@ -33,9 +33,7 @@ namespace rg
         Drawer();
 
         void draw(Quad &quad);
-        void draw(Quad &quad, const RenderSurface &rs);
         void draw(Sprite &sprite);
-        void draw(Sprite &sprite, const RenderSurface &rs);
 
         void addToBatch(Quad &quad);
         void addToBatch(Sprite &sprite);

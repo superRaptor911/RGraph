@@ -24,7 +24,7 @@ namespace rg
         SpriteDrawer();
         void drawSprite(Sprite &sprite);
         void drawSprite(Sprite &sprite, const glm::mat4 &surfaceTransform);
-        void drawSprite(Sprite &sprite, const RenderSurface &rs);
+        void drawSprite(Sprite &sprite, Shader &shader);
     };
 }
 

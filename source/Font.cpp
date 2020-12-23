@@ -1,3 +1,4 @@
+#include "glm/fwd.hpp"
 #include <RG/r_util.h>
 #include <RG/Font.h>
 #include <RG/RGraph.h>
@@ -113,11 +114,10 @@ bool Font::loadFont(const std::string &path, uint font_size)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	// now store character for later use
 	Character character = {
-	    texture, 
+	    Texture(texture, glm::vec2(face->glyph->bitmap.width, face->glyph->bitmap.rows), 1), 
 	    glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
 	    glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
 	    (face->glyph->advance.x >> 6),
-	    f_offset
 	};
 	f_offset += character.Advance;
 	m_characters.insert(std::pair<char, Character>(c, character));
@@ -138,108 +138,108 @@ bool Font::loadFont(const std::string &path, uint font_size)
 	return false;
     }
 
-    // Shader source
-    const char *vs_src ="#version 330 core \n"
-	"layout (location = 0) in vec2 vertex;\n"
-	"out vec2 TexCoords;\n"
-	"uniform mat4 proj;\n"
-	"uniform mat4 model;\n"
-	"void main()\n"
-	"{\n"
-	"gl_Position = proj * model * vec4(vertex.xy, 0.0, 1.0);\n"
-	"TexCoords = vertex.xy;\n"
-	"}\n";
+   // // Shader source
+   // const char *vs_src ="#version 330 core \n"
+   //     "layout (location = 0) in vec2 vertex;\n"
+   //     "out vec2 TexCoords;\n"
+   //     "uniform mat4 proj;\n"
+   //     "uniform mat4 model;\n"
+   //     "void main()\n"
+   //     "{\n"
+   //     "gl_Position = proj * model * vec4(vertex.xy, 0.0, 1.0);\n"
+   //     "TexCoords = vertex.xy;\n"
+   //     "}\n";
 
-    const char *fs_src = "#version 330 core \n in vec2 TexCoords;" 
-	"out vec4 color;" 
-	"uniform sampler2D text;" 
-	"uniform vec3 textColor;" 
-	"void main()"
-	"{"
-	"vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);" 
-	"color = vec4(textColor, 1.0) * sampled;" 
-	"}";
+   // const char *fs_src = "#version 330 core \n in vec2 TexCoords;" 
+   //     "out vec4 color;" 
+   //     "uniform sampler2D text;" 
+   //     "uniform vec3 textColor;" 
+   //     "void main()"
+   //     "{"
+   //     "vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);" 
+   //     "color = vec4(textColor, 1.0) * sampled;" 
+   //     "}";
 
-    // Create Shader
-    shader = rg::Shader(vs_src, fs_src);
+   // // Create Shader
+   // shader = rg::Shader(vs_src, fs_src);
 
-    const float Vertex_data[8] = {
-	// positions and texture coords
-	0.f,   1.f,
-	1.f,   1.f,
-	1.f,   0.f,
-	0.f,   0.f
-    };
+   // const float Vertex_data[8] = {
+   //     // positions and texture coords
+   //     0.f,   1.f,
+   //     1.f,   1.f,
+   //     1.f,   0.f,
+   //     0.f,   0.f
+   // };
 
-    const uint Indices[6] = {
-	0, 1, 2, // first triangle
-	2, 3, 0  // second triangle
-    };
+   // const uint Indices[6] = {
+   //     0, 1, 2, // first triangle
+   //     2, 3, 0  // second triangle
+   // };
 
-    int vertex_size = sizeof(float) * 2;
+   // int vertex_size = sizeof(float) * 2;
 
-    // position attribute
-    glGenVertexArrays(1, &m_VAO);
-    glGenBuffers(1, &m_VBO);
-    glGenBuffers(1, &m_EBO);
+   // // position attribute
+   // glGenVertexArrays(1, &m_VAO);
+   // glGenBuffers(1, &m_VBO);
+   // glGenBuffers(1, &m_EBO);
 
-    glBindVertexArray(m_VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-    glBufferData(GL_ARRAY_BUFFER, 4 * vertex_size, Vertex_data, GL_STATIC_DRAW);
+   // glBindVertexArray(m_VAO);
+   // glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+   // glBufferData(GL_ARRAY_BUFFER, 4 * vertex_size, Vertex_data, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(uint), Indices, GL_STATIC_DRAW);
+   // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
+   // glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(uint), Indices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, vertex_size, (void*)0);
-    glEnableVertexAttribArray(0);
+   // glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, vertex_size, (void*)0);
+   // glEnableVertexAttribArray(0);
 
-    glBindVertexArray(0);
+   // glBindVertexArray(0);
 
-    // Create Surface
-    auto last_ch = (--m_characters.end())->second;
-    RenderSurface rs(last_ch.offset + last_ch.Bearing.x, m_size);
-    rs.activate();
-    rs.setClearColor(Color(0.0f,0.0f,0.0f,0.0f));
-    rs.clear();
-    shader.setParam("textColor", glm::vec3(0.0f, 0.0f, 0.0f));
-    shader.setParam("proj", rs.getOrthoProjection());
-    shader.activate();	
+   // // Create Surface
+   // auto last_ch = (--m_characters.end())->second;
+   // RenderSurface rs(last_ch.offset + last_ch.Bearing.x, m_size);
+   // rs.activate();
+   // rs.setClearColor(Color(0.0f,0.0f,0.0f,0.0f));
+   // rs.clear();
+   // shader.setParam("textColor", glm::vec3(0.0f, 0.0f, 0.0f));
+   // shader.setParam("proj", rs.getOrthoProjection());
+   // shader.activate();	
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindVertexArray(m_VAO);
+   // glActiveTexture(GL_TEXTURE0);
+   // glBindVertexArray(m_VAO);
 
-    for (uchar c = 0; c < 128; c++)
-    {
-	Character ch = m_characters[c];
+   // for (uchar c = 0; c < 128; c++)
+   // {
+   //     Character ch = m_characters[c];
 
-	float xpos = ch.offset + ch.Bearing.x;
-	float ypos = m_max_bearing - ch.Bearing.y;
-	float w = ch.Size.x;
-	float h = ch.Size.y;
+   //     float xpos = ch.offset + ch.Bearing.x;
+   //     float ypos = m_max_bearing - ch.Bearing.y;
+   //     float w = ch.Size.x;
+   //     float h = ch.Size.y;
 
-	Quad q;
-	q.setPosition(glm::vec2(xpos,ypos));
-	q.setSize(glm::vec2(w, h));
-	shader.setParam("model", q.getTransformMatrix());
+   //     Quad q;
+   //     q.setPosition(glm::vec2(xpos,ypos));
+   //     q.setSize(glm::vec2(w, h));
+   //     shader.setParam("model", q.getTransformMatrix());
 
-	// render glyph texture over quad
-	glBindTexture(GL_TEXTURE_2D, ch.TextureID);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);	
-    }
+   //     // render glyph texture over quad
+   //     glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+   //     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);	
+   // }
 
-    // Cleanup
-    glBindVertexArray(0);
-    glDeleteBuffers(1, &m_VBO);
-    glDeleteBuffers(1, &m_EBO);
-    glDeleteVertexArrays(1, &m_VAO);
+   // // Cleanup
+   // glBindVertexArray(0);
+   // glDeleteBuffers(1, &m_VBO);
+   // glDeleteBuffers(1, &m_EBO);
+   // glDeleteVertexArrays(1, &m_VAO);
 
-    for (auto &i : m_characters)
-    {
-	glDeleteTextures(1, &i.second.TextureID);
-    }
+   // for (auto &i : m_characters)
+   // {
+   //     glDeleteTextures(1, &i.second.TextureID);
+   // }
 
-    rs.deactivate();
-    m_texture = rs.getTexture();
+   // rs.deactivate();
+   // m_texture = rs.getTexture();
     return true;
 }
 
@@ -253,7 +253,6 @@ void Font::m_detachRef()
 	if (!m_characters.empty())
 	{
 	    m_characters.clear();
-	    m_texture.destroy();
 	}
     }
 }

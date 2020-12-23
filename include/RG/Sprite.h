@@ -14,11 +14,11 @@ namespace rg
 
         Texture m_texture;
 	float m_Uvs[8] = {
-	    //UVS 
-            0.f,   1.f,
-            1.f,   1.f,
-            1.f,   0.f,
+        //UVS 
             0.f,   0.f,
+            1.f,   0.f,
+            1.f,   1.f,
+            0.f,   1.f,
 	};
 
 

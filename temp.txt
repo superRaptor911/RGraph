@@ -1,11 +1,21 @@
-"#version 330 core \n in vec2 TexCoords;" 
-"out vec4 color;" 
-"uniform sampler2D text;" 
-"uniform vec3 textColor;" 
-"void main()"
-"{"
-"vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);" 
-"color = vec4(textColor, 1.0) * sampled;" 
-"}";
+    // Shader source
+    const char *vs_src ="#version 330 core \n"
+	"layout (location = 0) in vec2 vertex;\n"
+	"out vec2 TexCoords;\n"
+	"uniform mat4 proj;\n"
+	"uniform mat4 model;\n"
+	"void main()\n"
+	"{\n"
+	"gl_Position = proj * model * vec4(vertex.xy, 0.0, 1.0);\n"
+	"TexCoords = vertex.xy;\n"
+	"}\n";
 
-
+    const char *fs_src = "#version 330 core \n in vec2 TexCoords;" 
+	"out vec4 color;" 
+	"uniform sampler2D text;" 
+	"uniform vec3 textColor;" 
+	"void main()"
+	"{"
+	"vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);" 
+	"color = vec4(textColor, 1.0) * sampled;" 
+	"}";

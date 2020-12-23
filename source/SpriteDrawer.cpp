@@ -44,7 +44,7 @@ SpriteDrawer::SpriteDrawer()
 
     glBindVertexArray(0);
 
-    std::string vertex_source = "#version 330 core\n"
+    static const std::string vertex_source = "#version 330 core\n"
                                 "layout (location = 0) in vec2 vpos;\n"
                                 "layout (location = 1) in vec2 UVs;\n"
                                 "out vec2 uv;\n"
@@ -58,7 +58,7 @@ SpriteDrawer::SpriteDrawer()
                                     " uv = UVs;\n"
                                 "}\n";
     
-    std::string frag_source = "#version 330 core\n"
+    static const std::string frag_source = "#version 330 core\n"
                             "out vec4 FragColor;\n"
                             "in vec2 uv;\n"
 
@@ -70,7 +70,8 @@ SpriteDrawer::SpriteDrawer()
                             "	FragColor = texture(tex, uv) * color;\n"
                             "}\n";
     
-    m_shader.createShader(vertex_source, frag_source);// = Shader(vertex_source, frag_source);
+    static const Shader shader(vertex_source, frag_source);
+    m_shader = shader;
 }
 
 
@@ -82,9 +83,9 @@ void SpriteDrawer::drawSprite(Sprite &sprite)
     m_shader.setParam("color", sprite.m_color);
     sprite.m_texture.activate();
 
-    // Activate default framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindVertexArray(m_VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_UVs);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, 8 * sizeof(float), &sprite.m_Uvs);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
@@ -97,23 +98,18 @@ void SpriteDrawer::drawSprite(Sprite &sprite, const glm::mat4 &surfaceTransform)
     sprite.m_texture.activate();
 
     glBindVertexArray(m_VAO);
-
-
     glBindBuffer(GL_ARRAY_BUFFER, m_UVs);
     glBufferSubData(GL_ARRAY_BUFFER, 0, 8 * sizeof(float), &sprite.m_Uvs);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-
-void SpriteDrawer::drawSprite(Sprite &sprite, const RenderSurface &rs)
+void SpriteDrawer::drawSprite(Sprite &sprite, Shader &shader)
 {
-    rs.activate();
-    m_shader.activate();
-    m_shader.setParam("proj", rs.getOrthoProjection());
-    m_shader.setParam("model", sprite.getTransformMatrix());
-    m_shader.setParam("color", sprite.m_color);
+    shader.activate();
     sprite.m_texture.activate();
-
     glBindVertexArray(m_VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_UVs);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, 8 * sizeof(float), &sprite.m_Uvs);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
+
